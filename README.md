@@ -1,4 +1,5 @@
 ﻿# StockMaster - Inventory Management System
+A comprehensive modular inventory management system with OTP-based authentication, designed for inventory managers and warehouse staff.
 
 - **Reviewer:** [Aman Patel(ampa)](https://github.com/ampa-odoo)
 
@@ -7,8 +8,6 @@
 - **Member:** [Tejas Panchal](https://github.com/Tejas-Panchal)
 - **Member:** [Dhyeya Dawawala](https://github.com/Dhyeya-Dawawala)
 - **Member:** [Dev Jagtap](https://github.com/jagtapdev55-afk)
-
-A comprehensive modular inventory management system with OTP-based authentication, designed for inventory managers and warehouse staff.
 
 ## Features
 
@@ -255,4 +254,5 @@ For issues or questions, please open an issue on GitHub.
 ---
 
 **Built for hackathons and production use** 🚀
+
 
