@@ -10,7 +10,7 @@ const Layout = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/login';
+    window.location.href = '/';
   };
 
   // Helper for active class
@@ -34,7 +34,7 @@ const Layout = () => {
         {/* Navigation */}
         <nav className="flex-1 p-4 overflow-y-auto">
           <p className="text-gray-500 text-xs font-bold uppercase mb-3 px-3 mt-2">Main</p>
-          <Link to="/" className={getLinkClass('/')}><FaChartPie className="mr-3" /> Dashboard</Link>
+          <Link to="/dashboard" className={getLinkClass('/dashboard')}><FaChartPie className='mr-3'/>Dashboard </Link>
           <Link to="/products" className={getLinkClass('/products')}><FaBox className="mr-3" /> Products</Link>
 
           <p className="text-gray-500 text-xs font-bold uppercase mb-3 px-3 mt-6">Operations</p>

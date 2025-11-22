@@ -23,7 +23,7 @@ const Login = () => {
 
 
 
-      window.location.href = '/'; // Force reload to update Layout
+      window.location.href = '/dashboard'; // Force reload to update Layout
       setLoading(false);
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");

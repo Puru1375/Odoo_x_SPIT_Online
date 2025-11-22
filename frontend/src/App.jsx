@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LandingPage from './pages/LandingPage'; 
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute'; // Import this
 import Login from './pages/Login';
@@ -25,13 +26,14 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Signup />} />
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Layout />}>
-            <Route index element={<Dashboard />} />
+            <Route path='dashboard' element={<Dashboard />} />
             <Route path="adjustment" element={<InventoryAdjustments />} />
             <Route path="settings" element={<Settings />} />
             <Route path="profile" element={<Profile />} />
