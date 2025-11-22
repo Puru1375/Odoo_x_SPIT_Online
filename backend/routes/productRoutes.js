@@ -56,7 +56,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// GET Stock Availability Per Location (Complex Logic)
+// GET Stock Availability Per Location
 router.get('/:id/stock-by-location', async (req, res) => {
   try {
     const productId = req.params.id;
@@ -83,14 +83,14 @@ router.get('/:id/stock-by-location', async (req, res) => {
       }
     });
 
-    // We need to replace Location IDs with Names. 
-    // In a real app, we use aggregation, but for Hackathon, we fetch locations map:
+    // Fetch all locations and include locationId in response
     const locations = await Location.find();
     const result = [];
 
     locations.forEach(loc => {
       if (loc.type === 'internal') { // Only care about internal stock
         result.push({
+          locationId: loc._id.toString(),
           name: loc.name,
           quantity: locationStock[loc._id.toString()] || 0
         });
@@ -99,6 +99,74 @@ router.get('/:id/stock-by-location', async (req, res) => {
 
     res.json(result);
 
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// POST Recalculate Stock for All Products (Fix Data Integrity)
+router.post('/recalculate-stock', async (req, res) => {
+  try {
+    const products = await Product.find();
+    let updatedCount = 0;
+
+    for (const product of products) {
+      // Fetch all "Done" moves for this product
+      const moves = await StockMove.find({ 
+        productId: product._id, 
+        status: 'done' 
+      });
+
+      let calculatedStock = 0;
+
+      moves.forEach(move => {
+        // If it has a destination (Incoming/Internal Transfer In)
+        if (move.destinationLocation) {
+           // We only care if it entered an INTERNAL location? 
+           // Actually, we should check if destination is internal.
+           // But for simplicity in this system, let's assume:
+           // If destination is set, it's added to that location.
+           // If source is set, it's removed from that location.
+           // Total Stock = Sum of all Internal Locations.
+           // But we don't want to fetch locations for every move.
+           
+           // Simplified Logic:
+           // Receipt (Vendor -> Internal): Increases Stock
+           // Delivery (Internal -> Customer): Decreases Stock
+           // Adjustment: 
+           //   - If Dest is Internal: Increase
+           //   - If Source is Internal: Decrease
+           // Internal Transfer: No change to Total Stock (Source Internal -> Dest Internal)
+           
+           // However, to be 100% accurate, we should sum based on Location Type.
+           // But we don't have populated locations here easily.
+           
+           // Let's use the Move Type logic which is faster:
+           if (move.type === 'receipt') {
+             calculatedStock += move.quantity;
+           } else if (move.type === 'adjustment' && move.destinationLocation) {
+             calculatedStock += move.quantity;
+           }
+        }
+
+        if (move.sourceLocation) {
+          if (move.type === 'delivery') {
+            calculatedStock -= move.quantity;
+          } else if (move.type === 'adjustment' && move.sourceLocation) {
+            calculatedStock -= move.quantity;
+          }
+        }
+      });
+
+      // Update if different
+      if (product.totalStock !== calculatedStock) {
+        product.totalStock = calculatedStock;
+        await product.save();
+        updatedCount++;
+      }
+    }
+
+    res.json({ message: `Recalculation complete. Updated ${updatedCount} products.` });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

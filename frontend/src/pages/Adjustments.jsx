@@ -7,7 +7,7 @@ const Adjustments = () => {
   const [locations, setLocations] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
-  const [adjustmentType, setAdjustmentType] = useState('physical_count'); // 'physical_count' or 'manual'
+  const [adjustmentType, setAdjustmentType] = useState('physical_count');
   const [physicalCount, setPhysicalCount] = useState('');
   const [manualQty, setManualQty] = useState('');
   const [reason, setReason] = useState('Inventory Count');
@@ -39,11 +39,9 @@ const Adjustments = () => {
       let adjustmentQty;
       
       if (adjustmentType === 'physical_count') {
-        // Calculate difference from current stock
         const currentStock = stockByLocation.find(s => s.locationId === selectedLocation)?.quantity || 0;
         adjustmentQty = parseInt(physicalCount) - currentStock;
       } else {
-        // Manual adjustment
         adjustmentQty = parseInt(manualQty);
       }
 
@@ -63,28 +61,36 @@ const Adjustments = () => {
         status: 'draft'
       };
 
-      await api.post('/moves', moveData);
+      const createResponse = await api.post('/moves', moveData);
+      const createdMove = createResponse.data;
+
+      // Immediately validate the move to update stock
+      await api.put(`/moves/${createdMove._id}/validate`);
       
       setMessage({ 
         type: 'success', 
-        text: `Stock adjustment created: ${adjustmentQty > 0 ? '+' : ''}${adjustmentQty} units` 
+        text: `✅ Stock adjusted: ${adjustmentQty > 0 ? '+' : ''}${adjustmentQty} units at ${locations.find(l => l._id === selectedLocation)?.name}` 
       });
       
-      // Refresh
-      api.get('/products').then(res => setProducts(res.data));
+      // Refresh product list and stock distribution
+      const productsRes = await api.get('/products');
+      setProducts(productsRes.data);
+      
       if (selectedProduct) {
-        api.get(`/products/${selectedProduct}/stock-by-location`)
-          .then(res => setStockByLocation(res.data));
+        const stockRes = await api.get(`/products/${selectedProduct}/stock-by-location`);
+        setStockByLocation(stockRes.data);
       }
       
       setPhysicalCount('');
       setManualQty('');
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
     } catch (err) {
       setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to adjust stock' });
     }
   };
 
-  // Find selected product details
   const activeProd = products.find(p => p._id === selectedProduct);
   const selectedLocationStock = stockByLocation.find(s => s.locationId === selectedLocation);
 
@@ -243,7 +249,7 @@ const Adjustments = () => {
                 type="submit"
                 className="w-full bg-purple-600 text-white p-3 rounded hover:bg-purple-700 font-bold transition"
               >
-                Create Adjustment
+                Apply Adjustment Now
               </button>
             </form>
           </div>
@@ -260,7 +266,7 @@ const Adjustments = () => {
                   <strong>{activeProd?.name}</strong>
                 </p>
                 <p className="text-2xl font-bold mb-4 text-blue-600">
-                  Total: {activeProd?.totalStock} {activeProd?.uom}
+                  Total: {stockByLocation.reduce((sum, loc) => sum + loc.quantity, 0)} {activeProd?.uom}
                 </p>
 
                 <div className="space-y-2">

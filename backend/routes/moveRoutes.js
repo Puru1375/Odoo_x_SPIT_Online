@@ -67,54 +67,20 @@ router.put('/:id/validate', protect, authorize('Manager'), async (req, res) => {
       // Outgoing: Subtract from stock
       product.totalStock -= move.quantity;
     } else if (move.type === 'adjustment') {
-        // Inventory Adjustment: Set stock to specific value or adjust diff
-        // For hackathon simplicity, let's assume adjustment is +/- quantity
-        product.totalStock += move.quantity; 
+        // Inventory Adjustment
+        if (move.destinationLocation) {
+            // Increase Stock (Incoming to Internal)
+            product.totalStock += move.quantity;
+        } else if (move.sourceLocation) {
+            // Decrease Stock (Outgoing from Internal)
+            product.totalStock -= move.quantity;
+        }
     }
     // Note: 'internal' moves don't change *total* stock, just location.
 
     await product.save();
 
     res.json({ message: "Move validated and stock updated", move });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// POST Create Inventory Adjustment
-router.post('/adjustment', protect, async (req, res) => {
-  const { productId, physicalCount, reason } = req.body;
-
-  try {
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ message: "Product not found" });
-
-    const currentStock = product.totalStock;
-    const difference = physicalCount - currentStock;
-
-    if (difference === 0) {
-      return res.status(400).json({ message: "No stock difference found." });
-    }
-
-    // Create the Move Log
-    const move = new StockMove({
-      reference: `INV/ADJ/${Date.now().toString().slice(-4)}`,
-      productId: productId,
-      sourceLocation: null, // Virtual Loss Location (Simplification)
-      destinationLocation: null,
-      quantity: Math.abs(difference), // Log the absolute change
-      type: 'adjustment',
-      status: 'done' // Adjustments are usually immediate
-    });
-
-    await move.save();
-
-    // Update Product Stock immediately
-    product.totalStock = physicalCount; // Set to the counted value
-    await product.save();
-
-    res.json({ message: `Stock adjusted by ${difference}`, newStock: physicalCount });
-
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

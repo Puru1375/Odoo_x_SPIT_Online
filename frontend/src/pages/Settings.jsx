@@ -3,7 +3,7 @@ import api from '../api';
 import { FaWarehouse, FaPlus, FaMapMarkerAlt, FaTrash } from 'react-icons/fa';
 
 const Settings = () => {
-  const [activeTab, setActiveTab] = useState('warehouses'); // Can expand to 'profile', 'users' later
+  const [activeTab, setActiveTab] = useState('warehouses');
   const [locations, setLocations] = useState([]);
   const [newLoc, setNewLoc] = useState({ name: '', type: 'internal' });
 
@@ -39,8 +39,12 @@ const Settings = () => {
         >
           Warehouse & Locations
         </button>
-        {/* You can add more tabs here later (e.g., "General", "Users") */}
-        
+        <button 
+          className={`pb-2 px-4 font-semibold ${activeTab === 'system' ? 'border-b-4 border-red-600 text-red-600' : 'text-gray-500'}`}
+          onClick={() => setActiveTab('system')}
+        >
+          System & Maintenance
+        </button>
       </div>
 
       {/* --- TAB CONTENT: WAREHOUSES --- */}
@@ -127,6 +131,40 @@ const Settings = () => {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* --- TAB CONTENT: SYSTEM --- */}
+      {activeTab === 'system' && (
+        <div className="max-w-2xl">
+          <div className="bg-red-50 border border-red-200 rounded p-6">
+            <h3 className="text-red-800 font-bold text-lg mb-2">Danger Zone</h3>
+            <p className="text-red-600 mb-4 text-sm">
+              Advanced actions for system maintenance. Use with caution.
+            </p>
+            
+            <div className="flex items-center justify-between bg-white p-4 rounded border border-red-100">
+              <div>
+                <p className="font-bold text-gray-800">Recalculate All Stock</p>
+                <p className="text-sm text-gray-500">Fixes "Ghost Stock" by summing up all move history.</p>
+              </div>
+              <button 
+                onClick={async () => {
+                  if(window.confirm("Are you sure? This will overwrite total stock values based on move history.")) {
+                    try {
+                      const res = await api.post('/products/recalculate-stock');
+                      alert(res.data.message);
+                    } catch(err) {
+                      alert("Failed: " + err.message);
+                    }
+                  }
+                }}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 font-bold text-sm"
+              >
+                Run Recalculation
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
