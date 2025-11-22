@@ -4,7 +4,8 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Receipts from './pages/Receipts';
-// import Deliveries from './pages/Deliveries'; // (Create this similarly to Receipts)
+import Deliveries from './pages/Deliveries';
+import InternalTransfers from './pages/InternalTransfers';
 
 function App() {
   return (
@@ -14,7 +15,8 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="products" element={<Products />} />
           <Route path="receipts" element={<Receipts />} />
-          <Route path="deliveries" element={<div>Deliveries Page (WIP)</div>} />
+          <Route path="deliveries" element={<Deliveries />} />
+          <Route path="internal" element={<InternalTransfers />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -22,6 +22,9 @@ const Layout = () => {
           <Link to="/deliveries" className="flex items-center p-3 hover:bg-gray-700 rounded">
             <FaExchangeAlt className="mr-3" /> Deliveries (Out)
           </Link>
+          <Link to="/internal" className="flex items-center p-3 hover:bg-gray-700 rounded">
+            <FaExchangeAlt className="mr-3" /> Internal Transfers
+          </Link>
         </nav>
       </aside>
 
