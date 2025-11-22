@@ -15,6 +15,8 @@ import InventoryAdjustments from './pages/InventoryAdjustments';
 import Adjustments from './pages/Adjustments';
 import Locations from './pages/Locations';
 import ProductDetail from './pages/ProductDetail';
+import ReceiptForm from './pages/ReceiptForm';
+import DeliveryForm from './pages/DeliveryForm';
 
 
 function App() {
@@ -39,6 +41,10 @@ function App() {
             <Route path="internal" element={<InternalTransfers />} />
             <Route path="adjustments" element={<Adjustments />} />
             <Route path="locations" element={<Locations />} />
+            <Route path="receipts/new" element={<ReceiptForm />} />   {/* For Creation */}
+            <Route path="receipts/:id" element={<ReceiptForm />} /> 
+            <Route path="deliveries/new" element={<DeliveryForm />} />
+            <Route path="deliveries/:id" element={<DeliveryForm />} />
           </Route>
         </Route>
       </Routes>

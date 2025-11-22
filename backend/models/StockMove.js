@@ -8,7 +8,8 @@ const stockMoveSchema = new mongoose.Schema({
   quantity: Number,
   type: { type: String, enum: ['receipt', 'delivery', 'internal', 'adjustment'] },
   status: { type: String, enum: ['draft', 'validated', 'done', 'cancelled'], default: 'draft' },
-  scheduledDate: Date,
+  scheduledDate: { type: Date, default: Date.now },
+  responsible: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   createdAt: { type: Date, default: Date.now }
 });
 module.exports = mongoose.model('StockMove', stockMoveSchema);

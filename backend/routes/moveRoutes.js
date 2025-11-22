@@ -35,7 +35,8 @@ router.post('/', protect, async (req, res) => {
     destinationLocation: req.body.destinationLocation,
     quantity: req.body.quantity,
     type: req.body.type, // 'receipt', 'delivery', 'internal'
-    status: 'draft' // Starts as draft
+    status: 'draft', // Starts as draft
+    responsible: req.user.id,
   });
 
   try {
@@ -84,6 +85,35 @@ router.put('/:id/validate', protect, authorize('Manager'), async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+});
+
+// PUT Update Status (Draft -> Ready -> Done)
+router.put('/:id/status', protect, async (req, res) => {
+  const { status } = req.body;
+  const move = await StockMove.findById(req.params.id);
+  
+  if (status === 'done' && move.status !== 'done') {
+     const Product = require('../models/Product');
+     const product = await Product.findById(move.productId);
+
+     // LOGIC FOR DELIVERY: Decrease Stock
+     if (move.type === 'delivery') {
+       if (product.totalStock < move.quantity) {
+         return res.status(400).json({ message: "Not enough stock to validate!" });
+       }
+       product.totalStock -= move.quantity;
+     } 
+     // LOGIC FOR RECEIPT: Increase Stock
+     else if (move.type === 'receipt') {
+       product.totalStock += move.quantity;
+     }
+     
+     await product.save();
+  }
+
+  move.status = status;
+  await move.save();
+  res.json(move);
 });
 
 module.exports = router;

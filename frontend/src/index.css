@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+@media print {
+  /* Hide Sidebar, Header, Footer, and Action Buttons */
+  aside, header, footer, .no-print, button {
+    display: none !important;
+  }
+
+  /* Expand the form to full width */
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* Remove backgrounds and shadows for crisp printing */
+  .printable-area {
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+  }
+
+  body {
+    background-color: white;
+  }
+}

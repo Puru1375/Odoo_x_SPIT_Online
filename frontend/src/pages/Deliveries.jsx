@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
+import { useNavigate } from 'react-router-dom';
 
 const Deliveries = () => {
   const [allMoves, setAllMoves] = useState([]);
@@ -16,8 +17,13 @@ const Deliveries = () => {
     quantity: 1
   });
 
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isManager = user?.role === "Manager";
+
   const [products, setProducts] = useState([]);
   const [locations, setLocations] = useState([]);
+
+  const navigate = useNavigate();
 
   // Fetch Deliveries Only
   const fetchMoves = () => api.get('/moves?type=delivery').then(res => {
@@ -61,74 +67,16 @@ const Deliveries = () => {
   };
 
   // Submit New Delivery
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // Logic: FROM Internal Warehouse TO Customer
-      const mainWhLoc = locations.find(l => l.type === 'internal')?._id;
-      const customerLoc = locations.find(l => l.type === 'customer')?._id;
-
-      if (!mainWhLoc || !customerLoc) {
-        alert("Missing Warehouse or Customer location data. Run seed script.");
-        return;
-      }
-
-      await api.post('/moves', {
-        type: 'delivery',
-        productId: formData.productId,
-        quantity: parseInt(formData.quantity),
-        sourceLocation: mainWhLoc,     // FROM: Warehouse
-        destinationLocation: customerLoc // TO: Customer
-      });
-      
-      setShowForm(false);
-      setFormData({ productId: '', quantity: 1 }); // Reset form
-      fetchMoves();
-    } catch (err) { alert("Failed to create delivery order"); }
-  };
-
+  
   return (
     <div>
       <div className="flex justify-between mb-6">
         <h1 className="text-2xl font-bold text-orange-600">Outgoing Deliveries</h1>
-        <button onClick={() => setShowForm(!showForm)} className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">
-          {showForm ? 'Close Form' : '+ New Delivery Order'}
-        </button>
+        <button onClick={() => navigate('/deliveries/new')}
+          className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
+        >New Delivery Order</button>
       </div>
 
-      {/* FORM */}
-      {showForm && (
-        <div className="bg-orange-50 p-4 rounded border border-orange-200 mb-6">
-          <h3 className="font-bold mb-2 text-orange-800">Create Delivery Order</h3>
-          <form onSubmit={handleSubmit} className="flex gap-4 items-end">
-            <div>
-              <label className="block text-sm font-medium">Product to Ship</label>
-              <select 
-                className="border p-2 rounded w-64"
-                onChange={e => setFormData({...formData, productId: e.target.value})}
-                required
-              >
-                <option value="">Select Product</option>
-                {products.map(p => <option key={p._id} value={p._id}>{p.name} (Stock: {p.totalStock})</option>)}
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium">Quantity</label>
-              <input 
-                type="number" 
-                className="border p-2 rounded w-24"
-                min="1"
-                value={formData.quantity}
-                onChange={e => setFormData({...formData, quantity: e.target.value})}
-                required 
-              />
-            </div>
-
-            <button type="submit" className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">Create Order</button>
-          </form>
-        </div>
-      )}
 
       {/* FILTERS */}
       <div className="bg-white p-4 rounded shadow mb-4 flex gap-4">
@@ -172,11 +120,13 @@ const Deliveries = () => {
           <thead className="bg-gray-100 border-b">
             <tr>
               <th className="text-left p-4">Reference</th>
-              <th className="text-left p-4">Customer</th>
+              <th className="text-left p-4">From</th>
+              <th className="text-left p-4">To</th>
               <th className="text-left p-4">Product</th>
               <th className="text-left p-4">Qty</th>
               <th className="text-left p-4">Status</th>
               <th className="text-left p-4">Action</th>
+              <th>  </th>
             </tr>
           </thead>
           <tbody>
@@ -188,6 +138,7 @@ const Deliveries = () => {
               filteredMoves.map(move => (
                 <tr key={move._id} className="border-b hover:bg-gray-50">
                   <td className="p-4 font-mono text-sm text-gray-600">{move.reference}</td>
+                  <td className="p-4">{move.sourceLocation?.name}</td>
                   <td className="p-4">{move.destinationLocation?.name}</td>
                   <td className="p-4 font-medium">{move.productId?.name}</td>
                   <td className="p-4 font-bold text-red-500">-{move.quantity}</td>
@@ -198,11 +149,21 @@ const Deliveries = () => {
                   </td>
                   <td className="p-4">
                     {move.status === 'draft' && (
-                      <button onClick={() => handleValidate(move._id)} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
-                        Validate
-                      </button>
+                      isManager ? (
+                        <button 
+                          onClick={() => handleValidate(move._id)}
+                          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                        >Validate</button>
+                      ) : (
+                        <span className="text-gray-500 italic text-sm">Manager Only</span>
+                      )
                     )}
+                    {move.status === 'done' && (
+                      <span className="text-sm text-gray-500 italic">No Actions</span>
+                    )}
+                    
                   </td>
+                  <td className="cursor-pointer text-blue-600" onClick={() => navigate(`/deliveries/${move._id}`)}>View</td>
                 </tr>
               ))
             )}

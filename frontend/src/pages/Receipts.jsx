@@ -1,69 +1,79 @@
-import React, { useEffect, useState } from 'react';
-import api from '../api';
+import React, { useEffect, useState } from "react";
+import api from "../api";
+import { useParams, useNavigate } from "react-router-dom";
+import { FaPrint, FaArrowLeft } from "react-icons/fa";
+
+
 
 const Receipts = () => {
   const [allMoves, setAllMoves] = useState([]);
   const [filteredMoves, setFilteredMoves] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  
+
   // Filter State
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+
   // Form State
   const [formData, setFormData] = useState({
-    productId: '',
+    productId: "",
     quantity: 1,
-    sourceLocation: '', 
-    destinationLocation: '' 
+    sourceLocation: "",
+    destinationLocation: "",
   });
 
   // Dropdown Data
   const [products, setProducts] = useState([]);
   const [locations, setLocations] = useState([]);
 
-  const user = JSON.parse(localStorage.getItem('user'));
-  const isManager = user?.role === 'Manager';
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isManager = user?.role === "Manager";
 
-  const fetchMoves = () => api.get('/moves?type=receipt').then(res => {
-    setAllMoves(res.data);
-    setFilteredMoves(res.data);
-  });
-  
+  const navigate = useNavigate();
+
+  const fetchMoves = () =>
+    api.get("/moves?type=receipt").then((res) => {
+      setAllMoves(res.data);
+      setFilteredMoves(res.data);
+    });
+
   useEffect(() => {
     fetchMoves();
     // Load data for dropdowns
-    api.get('/products').then(res => setProducts(res.data));
-    api.get('/locations').then(res => setLocations(res.data));
+    api.get("/products").then((res) => setProducts(res.data));
+    api.get("/locations").then((res) => setLocations(res.data));
   }, []);
 
   // Apply Filters
   useEffect(() => {
     let filtered = [...allMoves];
-    
+
     // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(move => move.status === statusFilter);
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((move) => move.status === statusFilter);
     }
-    
+
     // Search filter (by reference or product name)
     if (searchTerm) {
-      filtered = filtered.filter(move => 
-        move.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        move.productId?.name.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (move) =>
+          move.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          move.productId?.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     setFilteredMoves(filtered);
   }, [statusFilter, searchTerm, allMoves]);
 
   // Validate Move Logic
   const handleValidate = async (id) => {
-    if(!window.confirm("Validate receipt? Stock will increase.")) return;
+    if (!window.confirm("Validate receipt? Stock will increase.")) return;
     try {
       await api.put(`/moves/${id}/validate`);
       fetchMoves();
-    } catch (err) { alert("Error"); }
+    } catch (err) {
+      alert("Error");
+    }
   };
 
   // Submit New Receipt
@@ -71,27 +81,32 @@ const Receipts = () => {
     e.preventDefault();
     try {
       // Find Warehouse IDs automatically for better UX
-      const vendorLoc = locations.find(l => l.type === 'vendor')?._id;
-      const mainWhLoc = locations.find(l => l.type === 'internal')?._id;
+      const vendorLoc = locations.find((l) => l.type === "vendor")?._id;
+      const mainWhLoc = locations.find((l) => l.type === "internal")?._id;
 
-      await api.post('/moves', {
-        type: 'receipt',
+      await api.post("/moves", {
+        type: "receipt",
         productId: formData.productId,
         quantity: parseInt(formData.quantity),
         sourceLocation: vendorLoc, // Auto-select Vendor
-        destinationLocation: mainWhLoc // Auto-select Main Warehouse
+        destinationLocation: mainWhLoc, // Auto-select Main Warehouse
       });
       setShowForm(false);
       fetchMoves();
-    } catch (err) { alert("Failed to create receipt"); }
+    } catch (err) {
+      alert("Failed to create receipt");
+    }
   };
 
   return (
     <div>
       <div className="flex justify-between mb-6">
         <h1 className="text-2xl font-bold">Incoming Receipts</h1>
-        <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-4 py-2 rounded">
-          {showForm ? 'Close Form' : '+ New Receipt'}
+        <button
+          onClick={() =>  navigate("/receipts/new")}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          New Receipt
         </button>
       </div>
 
@@ -102,29 +117,42 @@ const Receipts = () => {
           <form onSubmit={handleSubmit} className="flex gap-4 items-end">
             <div>
               <label className="block text-sm">Product</label>
-              <select 
+              <select
                 className="border p-2 rounded w-48"
-                onChange={e => setFormData({...formData, productId: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, productId: e.target.value })
+                }
                 required
               >
                 <option value="">Select Product</option>
-                {products.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
+                {products.map((p) => (
+                  <option key={p._id} value={p._id}>
+                    {p.name}
+                  </option>
+                ))}
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm">Quantity</label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 className="border p-2 rounded w-24"
                 min="1"
                 value={formData.quantity}
-                onChange={e => setFormData({...formData, quantity: e.target.value})}
-                required 
+                onChange={(e) =>
+                  setFormData({ ...formData, quantity: e.target.value })
+                }
+                required
               />
             </div>
 
-            <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">Save Draft</button>
+            <button
+              type="submit"
+              className="bg-green-600 text-white px-4 py-2 rounded"
+            >
+              Save Draft
+            </button>
           </form>
         </div>
       )}
@@ -133,31 +161,34 @@ const Receipts = () => {
       <div className="bg-white p-4 rounded shadow mb-4 flex gap-4">
         <div>
           <label className="block text-sm font-semibold mb-1">Status</label>
-          <select 
+          <select
             className="border p-2 rounded"
             value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
+            onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="all">All</option>
             <option value="draft">Draft</option>
             <option value="done">Done</option>
           </select>
         </div>
-        
+
         <div className="flex-1">
           <label className="block text-sm font-semibold mb-1">Search</label>
-          <input 
+          <input
             type="text"
             className="border p-2 rounded w-full"
             placeholder="Search by reference or product..."
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
+
         <div className="flex items-end">
-          <button 
-            onClick={() => { setStatusFilter('all'); setSearchTerm(''); }}
+          <button
+            onClick={() => {
+              setStatusFilter("all");
+              setSearchTerm("");
+            }}
             className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
           >
             Clear Filters
@@ -171,43 +202,65 @@ const Receipts = () => {
           <thead className="bg-gray-100 border-b">
             <tr>
               <th className="text-left p-4">Reference</th>
+              <th className="text-left p-4">From</th>
               <th className="text-left p-4">Product</th>
+              <th className="text-left p-4">To</th>
               <th className="text-left p-4">Qty</th>
               <th className="text-left p-4">Status</th>
               <th className="text-left p-4">Action</th>
+              <th>  </th>
             </tr>
           </thead>
           <tbody>
             {filteredMoves.length === 0 ? (
               <tr>
-                <td colSpan="5" className="p-4 text-center text-gray-500">No receipts found</td>
+                <td colSpan="5" className="p-4 text-center text-gray-500">
+                  No receipts found
+                </td>
               </tr>
             ) : (
-              filteredMoves.map(move => (
+              filteredMoves.map((move) => (
                 <tr key={move._id} className="border-b">
                   <td className="p-4 font-mono text-sm">{move.reference}</td>
+                  <td className="p-4">{move.sourceLocation?.name}</td>
                   <td className="p-4">{move.productId?.name}</td>
+                  <td className="p-4">{move.destinationLocation?.name}</td>
                   <td className="p-4">+{move.quantity}</td>
                   <td className="p-4">
-                    {move.status === 'draft' && (
-                      <span className="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">Draft</span>
+                    {move.status === "draft" && (
+                      <span className="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">
+                        Draft
+                      </span>
                     )}
-                    {move.status === 'done' && (
-                      <span className="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">Done</span>
+                    {move.status === "done" && (
+                      <span className="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">
+                        Done
+                      </span>
                     )}
                   </td>
                   <td className="p-4">
-                  {move.status === 'done' ? (
-                    <span className="text-sm text-gray-500 italic">Validated</span>
-                  ) : (
-                    isManager ? (
-                      <button onClick={() => handleValidate(move._id)} className="bg-green-500 text-white px-3 py-1 rounded text-sm">
+                    {move.status === "done" ? (
+                      <span className="text-sm text-gray-500 italic">
+                        Validated
+                      </span>
+                    ) : isManager ? (
+                      <button
+                        onClick={() => handleValidate(move._id)}
+                        className="bg-green-500 text-white px-3 py-1 rounded text-sm"
+                      >
                         Validate
                       </button>
                     ) : (
-                      <span className="text-xs text-gray-400 italic">Awaiting Manager</span>
-                    )
-                  )}
+                      <span className="text-xs text-gray-400 italic">
+                        Awaiting Manager
+                      </span>
+                    )}
+                  </td>
+                  <td
+                    className="p-4 text-blue-600 cursor-pointer"
+                    onClick={() => navigate(`/receipts/${move._id}`)}
+                  >
+                    Viwe
                   </td>
                 </tr>
               ))
