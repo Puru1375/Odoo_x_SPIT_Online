@@ -58,7 +58,7 @@ const Login = () => {
             </div>
             <button className="bg-blue-600 text-white w-full py-2 rounded">Send OTP</button>
             <p className="mt-4 text-sm text-center">
-              Don't have an account? <Link to="/register" className="text-blue-600">Register</Link>
+              Don't have an account? <Link to="/signup" className="text-blue-600">Sign Up</Link>
             </p>
           </form>
         ) : (

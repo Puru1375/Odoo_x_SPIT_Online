@@ -1,14 +1,12 @@
 import React from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { FaBox, FaChartPie, FaTruck, FaExchangeAlt, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
 
 const Layout = () => {
-  const navigate = useNavigate();
-
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   return (
@@ -48,7 +46,7 @@ const Layout = () => {
           </Link>
           <button 
             onClick={handleLogout}
-            className="flex items-center w-full p-3 hover:bg-gray-700 rounded text-left"
+            className="flex items-center w-full p-3 hover:bg-gray-700 rounded text-left text-red-400 hover:text-red-300"
           >
             <FaSignOutAlt className="mr-3" /> Logout
           </button>
