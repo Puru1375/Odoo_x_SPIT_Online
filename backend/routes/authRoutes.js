@@ -2,100 +2,107 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const User = require('../models/User');
 
-// Secret key (should be in .env in production)
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
-
-// @route   POST /api/auth/signup
-// @desc    Register a new user
-// @access  Public
-router.post('/signup', async (req, res) => {
-  try {
-    const { name, email, password, role } = req.body;
-
-    // Check if user exists
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create user
-    user = new User({
-      name,
-      email,
-      password: hashedPassword,
-      role: role || 'Staff'
-    });
-
-    await user.save();
-
-    // Create Token
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
-
-    res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server Error' });
+// Email Transporter Configuration
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 
-// @route   POST /api/auth/login
-// @desc    Authenticate user & get token
-// @access  Public
+// 1. REGISTER
+router.post('/register', async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    
+    // Check if user exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: "User already exists" });
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({ name, email, password: hashedPassword });
+    await user.save();
+
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// 2. LOGIN (Step 1: Verify Creds & Send OTP)
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Check user
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid Credentials' });
-    }
 
-    // Validate password
+    if (!user) return res.status(400).json({ message: "User not found" });
+
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid Credentials' });
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+
+    // Generate 6 digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Save OTP to DB (valid for 10 mins)
+    user.otp = otp;
+    user.otpExpires = Date.now() + 10 * 60 * 1000;
+    await user.save();
+
+    // Send Email
+    // HACKATHON TIP: Console log the OTP so you don't get stuck if email fails
+    console.log(`🔥 HACKATHON OTP FOR ${email}: ${otp}`); 
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Your StockMaster Login OTP',
+      text: `Your OTP is: ${otp}`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        console.log("Email failed, but OTP logged in console.");
     }
 
-    // Create Token
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
+    res.json({ message: "OTP sent to email" });
 
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: err.message });
   }
 });
 
-// @route   POST /api/auth/reset-password
-// @desc    Reset password (Mock OTP)
-// @access  Public
-router.post('/reset-password', async (req, res) => {
-  // In a real app, we would generate an OTP, send it via email, and verify it.
-  // For this MVP, we will just simulate a successful reset if the email exists.
-  const { email, newPassword } = req.body;
-
+// 3. VERIFY OTP (Step 2: Issue Token)
+router.post('/verify-otp', async (req, res) => {
   try {
+    const { email, otp } = req.body;
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+
+    if (!user) return res.status(400).json({ message: "User not found" });
+
+    // Check OTP and Expiry
+    if (user.otp !== otp || user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
-    // Hash new password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
+    // Clear OTP
+    user.otp = undefined;
+    user.otpExpires = undefined;
     await user.save();
 
-    res.json({ message: 'Password reset successfully' });
+    // Generate JWT Token
+    const token = jwt.sign({ id: user._id, role: 'Manager' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: err.message });
   }
 });
 
