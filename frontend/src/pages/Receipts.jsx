@@ -22,6 +22,9 @@ const Receipts = () => {
   const [products, setProducts] = useState([]);
   const [locations, setLocations] = useState([]);
 
+  const user = JSON.parse(localStorage.getItem('user'));
+  const isManager = user?.role === 'Manager';
+
   const fetchMoves = () => api.get('/moves?type=receipt').then(res => {
     setAllMoves(res.data);
     setFilteredMoves(res.data);
@@ -186,16 +189,25 @@ const Receipts = () => {
                   <td className="p-4">{move.productId?.name}</td>
                   <td className="p-4">+{move.quantity}</td>
                   <td className="p-4">
-                    <span className={`px-2 py-1 rounded text-xs ${move.status === 'done' ? 'bg-green-200 text-green-800' : 'bg-gray-200'}`}>
-                      {move.status}
-                    </span>
+                    {move.status === 'draft' && (
+                      <span className="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-sm">Draft</span>
+                    )}
+                    {move.status === 'done' && (
+                      <span className="bg-green-200 text-green-800 px-2 py-1 rounded text-sm">Done</span>
+                    )}
                   </td>
                   <td className="p-4">
-                    {move.status === 'draft' && (
+                  {move.status === 'done' ? (
+                    <span className="text-sm text-gray-500 italic">Validated</span>
+                  ) : (
+                    isManager ? (
                       <button onClick={() => handleValidate(move._id)} className="bg-green-500 text-white px-3 py-1 rounded text-sm">
                         Validate
                       </button>
-                    )}
+                    ) : (
+                      <span className="text-xs text-gray-400 italic">Awaiting Manager</span>
+                    )
+                  )}
                   </td>
                 </tr>
               ))

@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const StockMove = require('../models/StockMove');
 const Product = require('../models/Product');
+const { protect, authorize } = require('../middleware/authMiddleware');
 
 // GET all moves (Filter by type via query param ?type=receipt)
-router.get('/', async (req, res) => {
+router.get('/', protect, async (req, res) => {
   try {
     const filter = {};
     if (req.query.type) filter.type = req.query.type;
@@ -23,7 +24,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST Create a NEW Move (Status: Draft)
-router.post('/', async (req, res) => {
+router.post('/', protect, async (req, res) => {
   // Generate a simple reference ID (e.g., WH/IN/timestamp)
   const reference = `WH/${req.body.type.toUpperCase()}/${Date.now().toString().slice(-4)}`;
 
@@ -46,7 +47,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT Validate a Move (Change Draft -> Done & Update Stock)
-router.put('/:id/validate', async (req, res) => {
+router.put('/:id/validate', protect, authorize('Manager'), async (req, res) => {
   try {
     const move = await StockMove.findById(req.params.id);
     if (!move) return res.status(404).json({ message: "Move not found" });
@@ -75,6 +76,45 @@ router.put('/:id/validate', async (req, res) => {
     await product.save();
 
     res.json({ message: "Move validated and stock updated", move });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// POST Create Inventory Adjustment
+router.post('/adjustment', protect, async (req, res) => {
+  const { productId, physicalCount, reason } = req.body;
+
+  try {
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    const currentStock = product.totalStock;
+    const difference = physicalCount - currentStock;
+
+    if (difference === 0) {
+      return res.status(400).json({ message: "No stock difference found." });
+    }
+
+    // Create the Move Log
+    const move = new StockMove({
+      reference: `INV/ADJ/${Date.now().toString().slice(-4)}`,
+      productId: productId,
+      sourceLocation: null, // Virtual Loss Location (Simplification)
+      destinationLocation: null,
+      quantity: Math.abs(difference), // Log the absolute change
+      type: 'adjustment',
+      status: 'done' // Adjustments are usually immediate
+    });
+
+    await move.save();
+
+    // Update Product Stock immediately
+    product.totalStock = physicalCount; // Set to the counted value
+    await product.save();
+
+    res.json({ message: `Stock adjusted by ${difference}`, newStock: physicalCount });
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
