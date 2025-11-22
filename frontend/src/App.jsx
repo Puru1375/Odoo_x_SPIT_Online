@@ -17,6 +17,7 @@ import Locations from './pages/Locations';
 import ProductDetail from './pages/ProductDetail';
 import ReceiptForm from './pages/ReceiptForm';
 import DeliveryForm from './pages/DeliveryForm';
+import ProductForm from './pages/ProductForm';
 
 
 function App() {
@@ -35,6 +36,8 @@ function App() {
             <Route path="settings" element={<Settings />} />
             <Route path="profile" element={<Profile />} />
             <Route path="products" element={<Products />} />
+            <Route path="products/new" element={<ProductForm />} />
+            <Route path="products/:id/edit" element={<ProductForm />} />
             <Route path="products/:id" element={<ProductDetail />} />
             <Route path="receipts" element={<Receipts />} />
             <Route path="deliveries" element={<Deliveries />} />

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
-import { FaArrowLeft, FaBoxOpen, FaExclamationTriangle } from 'react-icons/fa';
+import { FaArrowLeft, FaBoxOpen, FaExclamationTriangle, FaEdit } from 'react-icons/fa';
 
 const ProductDetail = () => {
   const { id } = useParams(); // Get ID from URL
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [locations, setLocations] = useState([]);
 
@@ -25,9 +26,20 @@ const ProductDetail = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <Link to="/products" className="text-gray-500 hover:text-gray-800 flex items-center mb-4">
-        <FaArrowLeft className="mr-2" /> Back to Products
-      </Link>
+      <div className="flex justify-between items-center mb-4">
+        <button 
+          onClick={() => navigate('/products')} 
+          className="text-gray-500 hover:text-gray-800 flex items-center"
+        >
+          <FaArrowLeft className="mr-2" /> Back to Products
+        </button>
+        <button 
+          onClick={() => navigate(`/products/${id}/edit`)}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center gap-2"
+        >
+          <FaEdit size={16} /> Edit Product
+        </button>
+      </div>
 
       {/* Header Card */}
       <div className="bg-white p-6 rounded shadow mb-6 border-l-4 border-blue-600">

@@ -15,6 +15,9 @@ const InternalTransfers = () => {
   const [products, setProducts] = useState([]);
   const [locations, setLocations] = useState([]);
 
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isManager = user?.role === "Manager";
+
   const fetchMoves = () => api.get('/moves?type=internal').then(res => setMoves(res.data));
   
   useEffect(() => {
@@ -132,10 +135,15 @@ const InternalTransfers = () => {
                   </span>
                 </td>
                 <td className="p-4">
-                  {move.status === 'draft' && (
-                    <button onClick={() => handleValidate(move._id)} className="bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                  {move.status === 'draft' && isManager ? (
+                    <button 
+                      onClick={() => handleValidate(move._id)} 
+                      className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+                    >
                       Validate
                     </button>
+                  ) : (
+                    <span className="text-sm text-gray-500 italic">No Actions</span>
                   )}
                 </td>
               </tr>

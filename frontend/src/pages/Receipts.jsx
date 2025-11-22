@@ -235,7 +235,7 @@ const Receipts = () => {
                   <td className="p-4">
                     {move.status === "done" ? (
                       <span className="text-sm text-gray-500 italic">
-                        Validated
+                        No Actions
                       </span>
                     ) : isManager ? (
                       <button
