@@ -14,6 +14,7 @@ import Settings from './pages/Settings';
 import InventoryAdjustments from './pages/InventoryAdjustments';
 import Adjustments from './pages/Adjustments';
 import Locations from './pages/Locations';
+import ProductDetail from './pages/ProductDetail';
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
             <Route path="settings" element={<Settings />} />
             <Route path="profile" element={<Profile />} />
             <Route path="products" element={<Products />} />
+            <Route path="products/:id" element={<ProductDetail />} />
             <Route path="receipts" element={<Receipts />} />
             <Route path="deliveries" element={<Deliveries />} />
             <Route path="internal" element={<InternalTransfers />} />

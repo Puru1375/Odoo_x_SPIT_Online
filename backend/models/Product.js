@@ -1,11 +1,13 @@
-// models/Product.js
 const mongoose = require('mongoose');
+
 const productSchema = new mongoose.Schema({
-  name: String,
-  sku: { type: String, unique: true },
-  category: String,
-  costPrice: Number,
-  totalStock: { type: Number, default: 0 }, // Denormalized total for speed
-  lowStockThreshold: { type: Number, default: 10 }
+  name: { type: String, required: true },
+  sku: { type: String, required: true, unique: true },
+  category: { type: String, default: 'Uncategorized' },
+  uom: { type: String, default: 'Units' }, // Unit of Measure (e.g., kg, pcs, m)
+  costPrice: { type: Number, default: 0 },
+  totalStock: { type: Number, default: 0 },
+  lowStockThreshold: { type: Number, default: 10 } // Reordering Rule
 });
+
 module.exports = mongoose.model('Product', productSchema);
