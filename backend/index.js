@@ -15,11 +15,13 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Error:", err));
 
-// Import Routes (We will create these next)
+// Import Routes
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/locations', require('./routes/locationRoutes'));
 app.use('/api/moves', require('./routes/moveRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/user', require('./routes/userRoutes'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

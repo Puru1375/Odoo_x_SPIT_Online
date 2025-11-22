@@ -2,8 +2,13 @@ import React, { useEffect, useState } from 'react';
 import api from '../api';
 
 const Receipts = () => {
-  const [moves, setMoves] = useState([]);
+  const [allMoves, setAllMoves] = useState([]);
+  const [filteredMoves, setFilteredMoves] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  
+  // Filter State
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Form State
   const [formData, setFormData] = useState({
@@ -17,7 +22,10 @@ const Receipts = () => {
   const [products, setProducts] = useState([]);
   const [locations, setLocations] = useState([]);
 
-  const fetchMoves = () => api.get('/moves?type=receipt').then(res => setMoves(res.data));
+  const fetchMoves = () => api.get('/moves?type=receipt').then(res => {
+    setAllMoves(res.data);
+    setFilteredMoves(res.data);
+  });
   
   useEffect(() => {
     fetchMoves();
@@ -25,6 +33,26 @@ const Receipts = () => {
     api.get('/products').then(res => setProducts(res.data));
     api.get('/locations').then(res => setLocations(res.data));
   }, []);
+
+  // Apply Filters
+  useEffect(() => {
+    let filtered = [...allMoves];
+    
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(move => move.status === statusFilter);
+    }
+    
+    // Search filter (by reference or product name)
+    if (searchTerm) {
+      filtered = filtered.filter(move => 
+        move.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        move.productId?.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    setFilteredMoves(filtered);
+  }, [statusFilter, searchTerm, allMoves]);
 
   // Validate Move Logic
   const handleValidate = async (id) => {
@@ -98,7 +126,43 @@ const Receipts = () => {
         </div>
       )}
 
-      {/* TABLE (Existing Code) */}
+      {/* FILTERS */}
+      <div className="bg-white p-4 rounded shadow mb-4 flex gap-4">
+        <div>
+          <label className="block text-sm font-semibold mb-1">Status</label>
+          <select 
+            className="border p-2 rounded"
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All</option>
+            <option value="draft">Draft</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+        
+        <div className="flex-1">
+          <label className="block text-sm font-semibold mb-1">Search</label>
+          <input 
+            type="text"
+            className="border p-2 rounded w-full"
+            placeholder="Search by reference or product..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex items-end">
+          <button 
+            onClick={() => { setStatusFilter('all'); setSearchTerm(''); }}
+            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
+
+      {/* TABLE */}
       <div className="bg-white rounded shadow">
         <table className="min-w-full">
           <thead className="bg-gray-100 border-b">
@@ -111,25 +175,31 @@ const Receipts = () => {
             </tr>
           </thead>
           <tbody>
-            {moves.map(move => (
-              <tr key={move._id} className="border-b">
-                <td className="p-4 font-mono text-sm">{move.reference}</td>
-                <td className="p-4">{move.productId?.name}</td>
-                <td className="p-4">+{move.quantity}</td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 rounded text-xs ${move.status === 'done' ? 'bg-green-200 text-green-800' : 'bg-gray-200'}`}>
-                    {move.status}
-                  </span>
-                </td>
-                <td className="p-4">
-                  {move.status === 'draft' && (
-                    <button onClick={() => handleValidate(move._id)} className="bg-green-500 text-white px-3 py-1 rounded text-sm">
-                      Validate
-                    </button>
-                  )}
-                </td>
+            {filteredMoves.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="p-4 text-center text-gray-500">No receipts found</td>
               </tr>
-            ))}
+            ) : (
+              filteredMoves.map(move => (
+                <tr key={move._id} className="border-b">
+                  <td className="p-4 font-mono text-sm">{move.reference}</td>
+                  <td className="p-4">{move.productId?.name}</td>
+                  <td className="p-4">+{move.quantity}</td>
+                  <td className="p-4">
+                    <span className={`px-2 py-1 rounded text-xs ${move.status === 'done' ? 'bg-green-200 text-green-800' : 'bg-gray-200'}`}>
+                      {move.status}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    {move.status === 'draft' && (
+                      <button onClick={() => handleValidate(move._id)} className="bg-green-500 text-white px-3 py-1 rounded text-sm">
+                        Validate
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

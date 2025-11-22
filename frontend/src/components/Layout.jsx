@@ -1,8 +1,16 @@
 import React from 'react';
-import { Link, Outlet } from 'react-router-dom';
-import { FaBox, FaChartPie, FaTruck, FaExchangeAlt } from 'react-icons/fa';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { FaBox, FaChartPie, FaTruck, FaExchangeAlt, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
 
 const Layout = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -25,7 +33,26 @@ const Layout = () => {
           <Link to="/internal" className="flex items-center p-3 hover:bg-gray-700 rounded">
             <FaExchangeAlt className="mr-3" /> Internal Transfers
           </Link>
+          <Link to="/adjustments" className="flex items-center p-3 hover:bg-gray-700 rounded">
+            <FaExchangeAlt className="mr-3" /> Inventory Adjustments
+          </Link>
         </nav>
+        
+        {/* Bottom Section - Profile & Settings */}
+        <div className="p-4 border-t border-gray-700 space-y-2">
+          <Link to="/profile" className="flex items-center p-3 hover:bg-gray-700 rounded">
+            <FaUser className="mr-3" /> Profile
+          </Link>
+          <Link to="/settings" className="flex items-center p-3 hover:bg-gray-700 rounded">
+            <FaCog className="mr-3" /> Settings
+          </Link>
+          <button 
+            onClick={handleLogout}
+            className="flex items-center w-full p-3 hover:bg-gray-700 rounded text-left"
+          >
+            <FaSignOutAlt className="mr-3" /> Logout
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
