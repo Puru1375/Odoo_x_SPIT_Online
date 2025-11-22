@@ -113,7 +113,7 @@ const Settings = () => {
                         <FaMapMarkerAlt className="text-gray-400" /> {loc.name}
                       </td>
                       <td className="p-4">
-                        <span className={`px-2 py-1 rounded text-xs font-bold 
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold 
                           ${loc.type === 'internal' ? 'bg-green-100 text-green-700' : 
                             loc.type === 'vendor' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'}`}>
                           {loc.type.toUpperCase()}

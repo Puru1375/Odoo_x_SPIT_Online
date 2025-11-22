@@ -143,7 +143,7 @@ const Deliveries = () => {
                   <td className="p-4 font-medium">{move.productId?.name}</td>
                   <td className="p-4 font-bold text-red-500">-{move.quantity}</td>
                   <td className="p-4">
-                    <span className={`px-2 py-1 rounded text-xs font-bold ${move.status === 'done' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${move.status === 'done' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                       {move.status.toUpperCase()}
                     </span>
                   </td>
