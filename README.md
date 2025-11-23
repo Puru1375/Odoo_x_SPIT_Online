@@ -75,7 +75,7 @@ EMAIL_PASS=your-gmail-app-password
 Run database seeding (optional):
 
 ```bash
-node seed.js
+node index.js
 ```
 
 Start backend server:
