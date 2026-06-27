@@ -70,20 +70,20 @@ const Deliveries = () => {
   
   return (
     <div>
-      <div className="flex justify-between mb-6">
-        <h1 className="text-2xl font-bold text-orange-600">Outgoing Deliveries</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
+        <h1 className="text-xl sm:text-2xl font-bold text-orange-600">Outgoing Deliveries</h1>
         <button onClick={() => navigate('/deliveries/new')}
-          className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
+          className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 w-full sm:w-auto text-sm sm:text-base"
         >New Delivery Order</button>
       </div>
 
 
       {/* FILTERS */}
-      <div className="bg-white p-4 rounded shadow mb-4 flex gap-4">
-        <div>
-          <label className="block text-sm font-semibold mb-1">Status</label>
-          <select 
-            className="border p-2 rounded"
+      <div className="bg-white p-3 sm:p-4 rounded shadow mb-4 flex flex-col sm:flex-row gap-3 sm:gap-4">
+        <div className="flex-none sm:flex-none">
+          <label className="block text-xs sm:text-sm font-semibold mb-1">Status</label>
+          <select
+            className="border p-2 rounded w-full sm:w-auto text-sm sm:text-base"
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
           >
@@ -94,10 +94,10 @@ const Deliveries = () => {
         </div>
         
         <div className="flex-1">
-          <label className="block text-sm font-semibold mb-1">Search</label>
+          <label className="block text-xs sm:text-sm font-semibold mb-1">Search</label>
           <input 
             type="text"
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full text-sm sm:text-base"
             placeholder="Search by reference or product..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
@@ -107,7 +107,7 @@ const Deliveries = () => {
         <div className="flex items-end">
           <button 
             onClick={() => { setStatusFilter('all'); setSearchTerm(''); }}
-            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 w-full sm:w-auto text-sm sm:text-base"
           >
             Clear Filters
           </button>
@@ -116,59 +116,61 @@ const Deliveries = () => {
 
       {/* TABLE */}
       <div className="bg-white rounded shadow overflow-hidden">
-        <table className="min-w-full">
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
           <thead className="bg-gray-100 border-b">
             <tr>
-              <th className="text-left p-4">Reference</th>
-              <th className="text-left p-4">From</th>
-              <th className="text-left p-4">To</th>
-              <th className="text-left p-4">Product</th>
-              <th className="text-left p-4">Qty</th>
-              <th className="text-left p-4">Status</th>
-              <th className="text-left p-4">Action</th>
-              <th>  </th>
+              <th className="text-left p-2 sm:p-4 text-xs sm:text-sm">Reference</th>
+              <th className="text-left p-2 sm:p-4 text-xs sm:text-sm hidden sm:table-cell">From</th>
+              <th className="text-left p-2 sm:p-4 text-xs sm:text-sm hidden md:table-cell">To</th>
+              <th className="text-left p-2 sm:p-4 text-xs sm:text-sm">Product</th>
+              <th className="text-left p-2 sm:p-4 text-xs sm:text-sm">Qty</th>
+              <th className="text-left p-2 sm:p-4 text-xs sm:text-sm">Status</th>
+              <th className="text-left p-2 sm:p-4 text-xs sm:text-sm">Action</th>
+              <th className="text-xs sm:text-sm">  </th>
             </tr>
           </thead>
           <tbody>
             {filteredMoves.length === 0 ? (
               <tr>
-                <td colSpan="6" className="p-4 text-center text-gray-500">No deliveries found</td>
+                <td colSpan="8" className="p-4 text-center text-gray-500 text-xs sm:text-sm">No deliveries found</td>
               </tr>
             ) : (
               filteredMoves.map(move => (
                 <tr key={move._id} className="border-b hover:bg-gray-50">
-                  <td className="p-4 font-mono text-sm text-gray-600">{move.reference}</td>
-                  <td className="p-4">{move.sourceLocation?.name}</td>
-                  <td className="p-4">{move.destinationLocation?.name}</td>
-                  <td className="p-4 font-medium">{move.productId?.name}</td>
-                  <td className="p-4 font-bold text-red-500">-{move.quantity}</td>
-                  <td className="p-4">
+                  <td className="p-2 sm:p-4 font-mono text-xs">{move.reference}</td>
+                  <td className="p-2 sm:p-4 text-xs sm:text-sm hidden sm:table-cell">{move.sourceLocation?.name}</td>
+                  <td className="p-2 sm:p-4 text-xs sm:text-sm hidden md:table-cell">{move.destinationLocation?.name}</td>
+                  <td className="p-2 sm:p-4 font-medium text-xs sm:text-sm">{move.productId?.name}</td>
+                  <td className="p-2 sm:p-4 font-bold text-red-500 text-xs sm:text-sm">-{move.quantity}</td>
+                  <td className="p-2 sm:p-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-bold ${move.status === 'done' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                       {move.status.toUpperCase()}
                     </span>
                   </td>
-                  <td className="p-4">
+                  <td className="p-2 sm:p-4">
                     {move.status === 'draft' && (
                       isManager ? (
                         <button 
                           onClick={() => handleValidate(move._id)}
-                          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                          className="bg-green-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded hover:bg-green-700 text-xs sm:text-sm"
                         >Validate</button>
                       ) : (
-                        <span className="text-gray-500 italic text-sm">Manager Only</span>
+                        <span className="text-gray-500 italic text-xs">Manager Only</span>
                       )
                     )}
                     {move.status === 'done' && (
-                      <span className="text-sm text-gray-500 italic">No Actions</span>
+                      <span className="text-xs text-gray-500 italic">No Actions</span>
                     )}
                     
                   </td>
-                  <td className="cursor-pointer text-blue-600" onClick={() => navigate(`/deliveries/${move._id}`)}>View</td>
+                  <td className="cursor-pointer text-blue-600 text-xs sm:text-sm p-2 sm:p-4" onClick={() => navigate(`/deliveries/${move._id}`)}>View</td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

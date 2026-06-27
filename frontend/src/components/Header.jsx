@@ -48,29 +48,30 @@ const Header = () => {
   const currentPageName = getCurrentPageName();
 
   return (
-    <header className="bg-white h-16 shadow-sm flex items-center justify-between px-8 z-10">
+    <header className="bg-white h-16 shadow-sm flex items-center justify-between px-4 sm:px-6 lg:px-8 z-10">
       {/* Left: Page Title */}
-      <div className="text-gray-500 text-sm">
-        StockMaster &gt; <span className="text-gray-800 font-semibold">
+      <div className="text-gray-500 text-xs sm:text-sm ml-14 lg:ml-0">
+        <span className="hidden sm:inline">StockMaster &gt; </span>
+        <span className="text-gray-800 font-semibold">
             {currentPageName}
         </span>
       </div>
 
       {/* Right: User Profile */}
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3 sm:gap-6">
         {/* Notification Icon */}
         <button className="relative text-gray-500 hover:text-blue-600">
-          <FaBell size={20} />
+          <FaBell size={18} className="sm:w-5 sm:h-5" />
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
         </button>
 
         {/* User Info */}
-        <div className="flex items-center gap-3 border-l pl-6">
+        <div className="flex items-center gap-2 sm:gap-3 border-l pl-3 sm:pl-6">
           <div className="text-right hidden md:block">
             <p className="text-sm font-bold text-gray-800">{user.name}</p>
             <p className="text-xs text-gray-500 uppercase">{user.role}</p>
           </div>
-          <FaUserCircle size={32} className="text-gray-400" />
+          <FaUserCircle size={28} className="text-gray-400 sm:w-8 sm:h-8" />
         </div>
       </div>
     </header>

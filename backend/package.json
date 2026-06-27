@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "seed": "node seed.js"
   },
   "keywords": [],
   "author": "",
@@ -13,12 +17,25 @@
   "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
-    "cors": "^2.8.5",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "dotenv": "^17.2.3",
+    "eslint": "^10.5.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^9.0.0",
-    "nodemailer": "^7.0.10",
-    "nodemon": "^3.1.11"
+    "morgan": "^1.11.0",
+    "nodemailer": "^9.0.1",
+    "nodemon": "^3.1.11",
+    "pg": "^8.13.1",
+    "redis": "^6.0.1",
+    "winston": "^3.19.0",
+    "winston-daily-rotate-file": "^5.0.0"
+  },
+  "devDependencies": {
+    "baseline-browser-mapping": "^2.10.38"
   }
 }

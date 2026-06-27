@@ -96,21 +96,21 @@ const Adjustments = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6 flex items-center">
-        <FaBoxOpen className="mr-3 text-purple-600" /> Stock Adjustments
+      <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 flex items-center">
+        <FaBoxOpen className="mr-2 sm:mr-3 text-purple-600" /> Stock Adjustments
       </h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         
         {/* LEFT: Adjustment Form */}
         <div className="lg:col-span-2">
-          <div className="bg-white p-6 rounded shadow border">
-            <p className="mb-6 text-gray-600">
+          <div className="bg-white p-4 sm:p-6 rounded shadow border">
+            <p className="mb-4 sm:mb-6 text-gray-600 text-sm sm:text-base">
               Correct stock levels for specific locations (e.g., damaged items, theft, counting errors)
             </p>
 
             {message && (
-              <div className={`p-3 mb-4 rounded ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+              <div className={`p-2 sm:p-3 mb-4 rounded text-sm sm:text-base ${message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                 {message.text}
               </div>
             )}
@@ -121,7 +121,7 @@ const Adjustments = () => {
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Select Product</label>
                 <select 
-                  className="w-full border p-2 rounded focus:ring-2 focus:ring-purple-200"
+                  className="w-full border p-2 sm:p-3 rounded focus:ring-2 focus:ring-purple-200 text-sm sm:text-base"
                   onChange={e => {
                     setSelectedProduct(e.target.value);
                     setSelectedLocation('');
@@ -139,11 +139,11 @@ const Adjustments = () => {
 
               {/* Location Selection */}
               <div className="mb-4">
-                <label className="block text-sm font-bold mb-2 flex items-center">
+                <label className="flex items-center text-sm font-bold mb-2">
                   <FaWarehouse className="mr-2 text-gray-400" /> Select Location
                 </label>
                 <select 
-                  className="w-full border p-2 rounded focus:ring-2 focus:ring-purple-200"
+                  className="w-full border p-2 sm:p-3 rounded focus:ring-2 focus:ring-purple-200 text-sm sm:text-base"
                   value={selectedLocation}
                   onChange={e => setSelectedLocation(e.target.value)}
                   required
@@ -162,16 +162,16 @@ const Adjustments = () => {
               </div>
 
               {selectedProduct && selectedLocation && (
-                <div className="mb-6 bg-purple-50 p-4 rounded border border-purple-200">
-                  <p className="font-bold text-purple-900">Current Stock at {locations.find(l => l._id === selectedLocation)?.name}:</p>
-                  <p className="text-3xl font-bold text-purple-700">{selectedLocationStock?.quantity || 0} {activeProd?.uom}</p>
+                <div className="mb-4 sm:mb-6 bg-purple-50 p-3 sm:p-4 rounded border border-purple-200">
+                  <p className="font-bold text-purple-900 text-sm sm:text-base">Current Stock at {locations.find(l => l._id === selectedLocation)?.name}:</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-purple-700">{selectedLocationStock?.quantity || 0} {activeProd?.uom}</p>
                 </div>
               )}
 
               {/* Adjustment Type Toggle */}
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-2">Adjustment Type</label>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
                   <label className="flex items-center cursor-pointer">
                     <input 
                       type="radio" 
@@ -181,7 +181,7 @@ const Adjustments = () => {
                       onChange={() => setAdjustmentType('physical_count')}
                       className="mr-2"
                     />
-                    <span>Physical Count</span>
+                    <span className="text-sm sm:text-base">Physical Count</span>
                   </label>
                   <label className="flex items-center cursor-pointer">
                     <input 
@@ -192,7 +192,7 @@ const Adjustments = () => {
                       onChange={() => setAdjustmentType('manual')}
                       className="mr-2"
                     />
-                    <span>Manual +/- Adjustment</span>
+                    <span className="text-sm sm:text-base">Manual +/- Adjustment</span>
                   </label>
                 </div>
               </div>
@@ -203,7 +203,7 @@ const Adjustments = () => {
                   <label className="block text-sm font-bold mb-2">Actual Physical Count</label>
                   <input 
                     type="number" 
-                    className="w-full border p-2 rounded font-bold text-lg focus:ring-2 focus:ring-purple-200"
+                    className="w-full border p-2 sm:p-3 rounded font-bold text-base sm:text-lg focus:ring-2 focus:ring-purple-200"
                     placeholder="Enter counted quantity"
                     value={physicalCount}
                     onChange={e => setPhysicalCount(e.target.value)}
@@ -218,7 +218,7 @@ const Adjustments = () => {
                   <label className="block text-sm font-bold mb-2">Adjustment Quantity</label>
                   <input 
                     type="number" 
-                    className="w-full border p-2 rounded font-bold text-lg focus:ring-2 focus:ring-purple-200"
+                    className="w-full border p-2 sm:p-3 rounded font-bold text-base sm:text-lg focus:ring-2 focus:ring-purple-200"
                     placeholder="e.g., -5 for decrease, +10 for increase"
                     value={manualQty}
                     onChange={e => setManualQty(e.target.value)}
@@ -233,7 +233,7 @@ const Adjustments = () => {
               <div className="mb-6">
                 <label className="block text-sm font-bold mb-2">Reason</label>
                 <select 
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2 sm:p-3 rounded text-sm sm:text-base"
                   value={reason}
                   onChange={e => setReason(e.target.value)}
                 >
@@ -247,7 +247,7 @@ const Adjustments = () => {
 
               <button 
                 type="submit"
-                className="w-full bg-purple-600 text-white p-3 rounded hover:bg-purple-700 font-bold transition"
+                className="w-full bg-purple-600 text-white p-2 sm:p-3 rounded hover:bg-purple-700 font-bold transition text-sm sm:text-base"
               >
                 Apply Adjustment Now
               </button>
@@ -257,33 +257,33 @@ const Adjustments = () => {
 
         {/* RIGHT: Stock Distribution Info */}
         <div className="lg:col-span-1">
-          <div className="bg-white p-6 rounded shadow border sticky top-4">
-            <h3 className="font-bold mb-4 text-gray-700">Stock Distribution</h3>
+          <div className="bg-white p-4 sm:p-6 rounded shadow border lg:sticky lg:top-4">
+            <h3 className="font-bold mb-4 text-gray-700 text-sm sm:text-base">Stock Distribution</h3>
             
             {selectedProduct ? (
               <div>
-                <p className="text-sm text-gray-600 mb-3">
+                <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   <strong>{activeProd?.name}</strong>
                 </p>
-                <p className="text-2xl font-bold mb-4 text-blue-600">
+                <p className="text-xl sm:text-2xl font-bold mb-4 text-blue-600">
                   Total: {stockByLocation.reduce((sum, loc) => sum + loc.quantity, 0)} {activeProd?.uom}
                 </p>
 
                 <div className="space-y-2">
                   {stockByLocation.length > 0 ? (
                     stockByLocation.map((stock, idx) => (
-                      <div key={idx} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                        <span className="text-sm font-medium">{stock.name}</span>
-                        <span className="font-bold text-gray-700">{stock.quantity}</span>
+                      <div key={idx} className="flex justify-between items-center p-2 bg-gray-50 rounded text-xs sm:text-sm">
+                        <span className="font-medium truncate mr-2">{stock.name}</span>
+                        <span className="font-bold text-gray-700 whitespace-nowrap">{stock.quantity}</span>
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-400 italic">No stock in any location</p>
+                    <p className="text-xs sm:text-sm text-gray-400 italic">No stock in any location</p>
                   )}
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-400 italic">Select a product to view stock distribution</p>
+              <p className="text-xs sm:text-sm text-gray-400 italic">Select a product to view stock distribution</p>
             )}
           </div>
         </div>

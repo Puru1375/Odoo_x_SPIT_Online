@@ -88,34 +88,34 @@ const ProductForm = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="max-w-2xl mx-auto p-4 sm:p-6">
       {/* Top Nav */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
         <button 
           onClick={() => navigate('/products')} 
-          className="text-gray-500 flex items-center hover:text-gray-800"
+          className="text-gray-500 flex items-center hover:text-gray-800 text-sm sm:text-base"
         >
           <FaArrowLeft className="mr-2" /> Back to Products
         </button>
-        <h1 className="text-2xl font-bold">
+        <h1 className="text-xl sm:text-2xl font-bold">
           {isNew ? 'Create New Product' : 'Edit Product'}
         </h1>
-        <div />
+        <div className="hidden sm:block" />
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-lg shadow p-8">
+      <div className="bg-white rounded-lg shadow p-4 sm:p-6 lg:p-8">
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             
             {/* Product Name */}
-            <div className="col-span-2">
+            <div className="col-span-1 sm:col-span-2">
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 Product Name <span className="text-red-500">*</span>
               </label>
               <input 
                 type="text"
-                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded-lg p-2 sm:p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.name}
                 onChange={e => setFormData({...formData, name: e.target.value})}
                 required
@@ -123,13 +123,13 @@ const ProductForm = () => {
             </div>
 
             {/* SKU */}
-            <div>
+            <div className="col-span-1">
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 SKU / Code <span className="text-red-500">*</span>
               </label>
               <input 
                 type="text"
-                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded-lg p-2 sm:p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.sku}
                 onChange={e => setFormData({...formData, sku: e.target.value})}
                 required
@@ -137,13 +137,13 @@ const ProductForm = () => {
             </div>
 
             {/* Category */}
-            <div>
+            <div className="col-span-1">
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 Category <span className="text-red-500">*</span>
               </label>
               <input 
                 type="text"
-                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded-lg p-2 sm:p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 list="cat-list"
                 value={formData.category}
                 onChange={e => setFormData({...formData, category: e.target.value})}
@@ -157,10 +157,10 @@ const ProductForm = () => {
             </div>
 
             {/* Unit of Measure */}
-            <div>
+            <div className="col-span-1">
               <label className="block text-sm font-bold text-gray-700 mb-2">Unit of Measure</label>
               <select 
-                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded-lg p-2 sm:p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.uom}
                 onChange={e => setFormData({...formData, uom: e.target.value})}
               >
@@ -172,26 +172,26 @@ const ProductForm = () => {
             </div>
 
             {/* Cost Price */}
-            <div>
+            <div className="col-span-1">
               <label className="block text-sm font-bold text-gray-700 mb-2">Cost Price (₹)</label>
               <input 
                 type="number"
                 step="0.01"
-                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded-lg p-2 sm:p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.costPrice}
                 onChange={e => setFormData({...formData, costPrice: e.target.value})}
               />
             </div>
 
             {/* Reorder Rule (Min) */}
-            <div>
+            <div className="col-span-1">
               <label className="block text-sm font-bold text-gray-700 mb-2">
                 Reorder Rule (Min) <span className="text-red-500">*</span>
               </label>
               <input 
                 type="number"
                 min="0"
-                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border rounded-lg p-2 sm:p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.lowStockThreshold}
                 onChange={e => setFormData({...formData, lowStockThreshold: e.target.value})}
                 required
@@ -200,14 +200,14 @@ const ProductForm = () => {
 
             {/* Initial Stock (Only for New Products) */}
             {isNew && (
-              <div className="col-span-2 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="col-span-1 sm:col-span-2 bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
                 <label className="block text-sm font-bold text-blue-700 mb-2">
                   Initial Stock (Optional)
                 </label>
                 <input 
                   type="number"
                   min="0"
-                  className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded-lg p-2 sm:p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter initial quantity (leave blank for 0)"
                   value={formData.initialStock}
                   onChange={e => setFormData({...formData, initialStock: e.target.value})}
@@ -218,17 +218,17 @@ const ProductForm = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-4 mt-8 pt-6 border-t">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
             <button 
               type="button"
               onClick={() => navigate('/products')}
-              className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 sm:px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto order-2 sm:order-1"
             >
               Cancel
             </button>
             <button 
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 w-full sm:w-auto order-1 sm:order-2"
             >
               {isNew ? 'Create Product' : 'Update Product'}
             </button>
