@@ -1,7 +1,15 @@
-// models/Location.js
-const mongoose = require('mongoose');
-const locationSchema = new mongoose.Schema({
-  name: String, // e.g., "Main Warehouse", "Vendor", "Customer"
-  type: { type: String, enum: ['internal', 'vendor', 'customer', 'inventory_loss'] }
-});
-module.exports = mongoose.model('Location', locationSchema);
+const { BaseModel } = require('./baseModel');
+
+class Location extends BaseModel {
+  static get tableName() {
+    return 'locations';
+  }
+
+  static get columnMap() {
+    return {
+      _id: 'id',
+    };
+  }
+}
+
+module.exports = Location;

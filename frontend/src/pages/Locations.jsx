@@ -32,14 +32,14 @@ const Locations = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 flex items-center">
-        <FaWarehouse className="mr-3 text-gray-600" /> Warehouse & Location Settings
+      <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 flex items-center">
+        <FaWarehouse className="mr-2 sm:mr-3 text-gray-600" /> Warehouse & Location Settings
       </h1>
 
       {/* --- ADD NEW LOCATION FORM --- */}
-      <div className="bg-white p-6 rounded shadow-md mb-8 border-t-4 border-blue-600">
-        <h3 className="font-bold text-lg mb-4">Add New Location</h3>
-        <form onSubmit={handleAdd} className="flex gap-4 items-end">
+      <div className="bg-white p-4 sm:p-6 rounded shadow-md mb-6 sm:mb-8 border-t-4 border-blue-600">
+        <h3 className="font-bold text-base sm:text-lg mb-4">Add New Location</h3>
+        <form onSubmit={handleAdd} className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-end">
           <div className="flex-1">
             <label className="block text-sm font-bold mb-1">Location Name</label>
             <input 
@@ -51,7 +51,7 @@ const Locations = () => {
             />
           </div>
           
-          <div className="w-64">
+          <div className="w-full sm:w-64">
             <label className="block text-sm font-bold mb-1">Type</label>
             <select 
               className="w-full border p-2 rounded"
@@ -64,7 +64,7 @@ const Locations = () => {
             </select>
           </div>
 
-          <button className="bg-blue-600 text-white px-6 py-2 rounded flex items-center hover:bg-blue-700">
+          <button className="bg-blue-600 text-white px-4 sm:px-6 py-2 rounded flex items-center justify-center hover:bg-blue-700 w-full sm:w-auto">
             <FaPlus className="mr-2" /> Add
           </button>
         </form>
@@ -72,20 +72,21 @@ const Locations = () => {
 
       {/* --- LOCATION LIST --- */}
       <div className="bg-white rounded shadow overflow-hidden">
-        <h3 className="font-bold text-lg p-4 border-b bg-gray-50">Existing Locations</h3>
-        <table className="min-w-full">
+        <h3 className="font-bold text-base sm:text-lg p-3 sm:p-4 border-b bg-gray-50">Existing Locations</h3>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm sm:text-base">
           <thead>
             <tr className="bg-gray-100 text-left">
-              <th className="p-4">Name</th>
-              <th className="p-4">Type</th>
-              <th className="p-4">ID (System)</th>
+              <th className="p-2 sm:p-4 text-xs sm:text-sm">Name</th>
+              <th className="p-2 sm:p-4 text-xs sm:text-sm">Type</th>
+              <th className="p-2 sm:p-4 text-xs sm:text-sm hidden sm:table-cell">ID (System)</th>
             </tr>
           </thead>
           <tbody>
             {locations.map(loc => (
               <tr key={loc._id} className="border-b hover:bg-gray-50">
-                <td className="p-4 font-bold">{loc.name}</td>
-                <td className="p-4">
+                <td className="p-2 sm:p-4 font-bold text-xs sm:text-base">{loc.name}</td>
+                <td className="p-2 sm:p-4">
                   <span className={`px-2 py-1 rounded text-xs text-white
                     ${loc.type === 'internal' ? 'bg-blue-500' : 
                       loc.type === 'vendor' ? 'bg-purple-500' : 'bg-orange-500'}`
@@ -93,11 +94,12 @@ const Locations = () => {
                     {loc.type.toUpperCase()}
                   </span>
                 </td>
-                <td className="p-4 text-gray-400 font-mono text-xs">{loc._id}</td>
+                <td className="p-2 sm:p-4 text-gray-400 font-mono text-xs hidden sm:table-cell">{loc._id}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

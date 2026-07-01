@@ -41,8 +41,8 @@ const Register = () => {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-96">
+    <div className="flex h-screen items-center justify-center bg-gray-100 px-4">
+      <div className="bg-white p-6 sm:p-8 rounded shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">
           {step === 1 ? 'Create Account' : 'Verify Email'}
         </h2>
@@ -50,23 +50,23 @@ const Register = () => {
         {step === 1 ? (
           <form onSubmit={handleRegister}>
             <div className="mb-4">
-              <label className="block mb-1 text-sm">Name</label>
-              <input type="text" required className="border w-full p-2 rounded"
+              <label className="block mb-1 text-sm font-medium">Name</label>
+              <input type="text" required className="border w-full p-2 sm:p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onChange={e => setFormData({...formData, name: e.target.value})} />
             </div>
             <div className="mb-4">
-              <label className="block mb-1 text-sm">Email</label>
-              <input type="email" required className="border w-full p-2 rounded"
+              <label className="block mb-1 text-sm font-medium">Email</label>
+              <input type="email" required className="border w-full p-2 sm:p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onChange={e => setFormData({...formData, email: e.target.value})} />
             </div>
             <div className="mb-4">
-              <label className="block mb-1 text-sm">Password</label>
-              <input type="password" required className="border w-full p-2 rounded"
+              <label className="block mb-1 text-sm font-medium">Password</label>
+              <input type="password" required className="border w-full p-2 sm:p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onChange={e => setFormData({...formData, password: e.target.value})} />
             </div>
             <div className="mb-6">
-              <label className="block mb-1 text-sm">Role</label>
-              <select className="border w-full p-2 rounded"
+              <label className="block mb-1 text-sm font-medium">Role</label>
+              <select className="border w-full p-2 sm:p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onChange={e => setFormData({...formData, role: e.target.value})}>
                 <option value="Staff">Staff (Create Only)</option>
                 <option value="Manager">Manager (Full Access)</option>
@@ -74,18 +74,18 @@ const Register = () => {
             </div>
             <button 
             disabled={loading}
-            className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700">
+            className="bg-blue-600 text-white w-full py-2 sm:py-3 rounded hover:bg-blue-700 transition disabled:opacity-50">
               {loading ? 'Sending Otp...' : 'Register'}
             </button>
           </form>
         ) : (
           <form onSubmit={handleVerify}>
              <p className="mb-4 text-sm text-gray-600">Enter the code sent to {formData.email}</p>
-            <input type="text" required className="border w-full p-2 rounded text-center tracking-widest text-xl mb-6"
+            <input type="text" required className="border w-full p-3 sm:p-4 rounded text-center tracking-widest text-xl mb-6 focus:outline-none focus:ring-2 focus:ring-green-500"
               maxLength="6" value={otp} onChange={e => setOtp(e.target.value)} />
             <button 
             disabled={loading}
-            className="bg-green-600 text-white w-full py-2 rounded hover:bg-green-700">
+            className="bg-green-600 text-white w-full py-2 sm:py-3 rounded hover:bg-green-700 transition disabled:opacity-50">
               {loading ? 'Verifying...' : 'Verify & Complete Registration'}
             </button>
           </form>
@@ -93,7 +93,7 @@ const Register = () => {
         
         {step === 1 && (
            <p className="mt-4 text-sm text-center">
-             Already verified? <Link to="/login" className="text-blue-600">Login</Link>
+             Already verified? <Link to="/login" className="text-blue-600 hover:underline">Login</Link>
            </p>
         )}
       </div>

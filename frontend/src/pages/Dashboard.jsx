@@ -45,10 +45,10 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Inventory Dashboard</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-gray-800">Inventory Dashboard</h1>
       
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <div className="bg-white p-6 rounded shadow-sm border-l-4 border-blue-500">
           <h3 className="text-gray-500 text-sm font-bold uppercase">Total Products</h3>
           <p className="text-3xl font-bold text-gray-800 mt-2">{stats.totalProducts}</p>
@@ -71,8 +71,8 @@ const Dashboard = () => {
       </div>
 
       <div className="mb-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold text-gray-700 flex items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+          <h2 className="text-base sm:text-lg font-bold text-gray-700 flex items-center">
             <FaBox className="mr-2 text-blue-600" /> Top Stock Overview
           </h2>
           <Link to="/products" className="text-sm text-blue-600 hover:underline flex items-center">
@@ -80,11 +80,11 @@ const Dashboard = () => {
           </Link>
         </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
           {products.slice(0, 5).map((product, index) => (
             <div 
               key={product._id} 
-              className={`bg-white p-4 rounded shadow-sm border border-gray-200 hover:shadow-md transition flex flex-col justify-between
+              className={`bg-white p-3 sm:p-4 rounded shadow-sm border border-gray-200 hover:shadow-md transition flex flex-col justify-between
                 ${index >= 2 ? 'hidden sm:block' : ''}
                 ${index >= 2 ? 'sm:hidden md:block' : ''}
                 ${index >= 3 ? 'md:hidden lg:block' : ''}
@@ -93,7 +93,7 @@ const Dashboard = () => {
             >
               <div>
                 <div className="flex justify-between items-start">
-                  <h3 className="font-bold text-gray-800 truncate w-full" title={product.name}>{product.name}</h3>
+                  <h3 className="font-bold text-sm sm:text-base text-gray-800 truncate w-full" title={product.name}>{product.name}</h3>
                 </div>
                 <div className="flex justify-between items-center mt-1">
                    <span className="text-[10px] bg-gray-100 text-gray-500 px-1 rounded">{product.sku}</span>
@@ -103,7 +103,7 @@ const Dashboard = () => {
               
               <div className="mt-3 pt-3 border-t border-gray-100 flex items-end justify-between">
                 <div>
-                  <span className={`text-xl font-bold ${product.totalStock <= product.lowStockThreshold ? 'text-red-600' : 'text-blue-600'}`}>
+                  <span className={`text-lg sm:text-xl font-bold ${product.totalStock <= product.lowStockThreshold ? 'text-red-600' : 'text-blue-600'}`}>
                     {product.totalStock}
                   </span>
                   <span className="text-xs text-gray-400 ml-1">{product.uom}</span>

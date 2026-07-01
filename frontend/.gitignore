@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+build
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +23,52 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Logs
+logs/
+*.log
+
+# Build
+dist/
+build/
+
+# Coverage
+coverage/
+
+# Prisma generated artifacts (if applicable)
+prisma/dev.db
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+
+# Terraform (future)
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+
+# AWS
+.aws/
+
+# Temporary
+tmp/
+.cache/
+
+.
+
+

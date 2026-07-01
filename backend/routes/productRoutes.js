@@ -3,15 +3,16 @@ const router = express.Router();
 const Product = require('../models/Product');
 const StockMove = require('../models/StockMove');
 const Location = require('../models/Location');
+const { protect, rateLimit } = require('../middleware/authMiddleware');
 
 // GET All
-router.get('/', async (req, res) => {
+router.get('/', rateLimit, async (req, res) => {
   const products = await Product.find();
   res.json(products);
 });
 
 // POST Create (Handles Initial Stock)
-router.post('/', async (req, res) => {
+router.post('/', protect, rateLimit, async (req, res) => {
   const { name, sku, category, uom, costPrice, lowStockThreshold, initialStock } = req.body;
 
   try {
@@ -47,11 +48,11 @@ router.post('/', async (req, res) => {
 });
 
 // PUT Update Product
-router.put('/:id', async (req, res) => {
+router.put('/:id', protect, rateLimit, async (req, res) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(updatedProduct);
-  } catch (err) {
+  } catch (_err) {
     res.status(400).json({ message: "Update failed" });
   }
 });

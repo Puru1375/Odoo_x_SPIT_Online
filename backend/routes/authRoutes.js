@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
+const { authRateLimit } = require('../middleware/authMiddleware');
 
 // Email Config
 const transporter = nodemailer.createTransport({
@@ -12,7 +13,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // 1. REGISTER (Send OTP)
-router.post('/register', async (req, res) => {
+router.post('/register', authRateLimit, async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
     
@@ -24,7 +25,7 @@ router.post('/register', async (req, res) => {
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpires = Date.now() + 10 * 60 * 1000; // 10 mins
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
     // Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -67,7 +68,7 @@ router.post('/register', async (req, res) => {
 });
 
 // 2. VERIFY OTP (Complete Registration)
-router.post('/verify-registration', async (req, res) => {
+router.post('/verify-registration', authRateLimit, async (req, res) => {
   try {
     const { email, otp } = req.body;
     const user = await User.findOne({ email });
@@ -75,7 +76,7 @@ router.post('/verify-registration', async (req, res) => {
     if (!user) return res.status(400).json({ message: "User not found" });
     if (user.isVerified) return res.status(400).json({ message: "User already verified" });
 
-    if (user.otp !== otp || user.otpExpires < Date.now()) {
+    if (user.otp !== otp || (user.otpExpires && user.otpExpires < new Date())) {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
@@ -93,7 +94,7 @@ router.post('/verify-registration', async (req, res) => {
 });
 
 // 3. LOGIN (Standard - No OTP)
-router.post('/login', async (req, res) => {
+router.post('/login', authRateLimit, async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });

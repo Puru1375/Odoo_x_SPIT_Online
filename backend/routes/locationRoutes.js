@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Location = require('../models/Location');
+const { rateLimit } = require('../middleware/authMiddleware');
 
 // GET all locations
-router.get('/', async (req, res) => {
+router.get('/', rateLimit, async (req, res) => {
   try {
     const locations = await Location.find();
     res.json(locations);
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST create a new location (e.g., "Warehouse A", "Vendor")
-router.post('/', async (req, res) => {
+router.post('/', rateLimit, async (req, res) => {
   const location = new Location({
     name: req.body.name,
     type: req.body.type // 'internal', 'vendor', 'customer'

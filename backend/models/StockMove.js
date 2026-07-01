@@ -1,15 +1,36 @@
-// models/StockMove.js
-const mongoose = require('mongoose');
-const stockMoveSchema = new mongoose.Schema({
-  reference: String, // e.g., WH/IN/0001
-  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-  sourceLocation: { type: mongoose.Schema.Types.ObjectId, ref: 'Location' },
-  destinationLocation: { type: mongoose.Schema.Types.ObjectId, ref: 'Location' },
-  quantity: Number,
-  type: { type: String, enum: ['receipt', 'delivery', 'internal', 'adjustment'] },
-  status: { type: String, enum: ['draft', 'validated', 'done', 'cancelled'], default: 'draft' },
-  scheduledDate: { type: Date, default: Date.now },
-  responsible: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  createdAt: { type: Date, default: Date.now }
-});
-module.exports = mongoose.model('StockMove', stockMoveSchema);
+const { BaseModel } = require('./baseModel');
+
+class StockMove extends BaseModel {
+  static get tableName() {
+    return 'stock_moves';
+  }
+
+  static get fieldTransforms() {
+    return {
+      quantity: Number,
+    };
+  }
+
+  static get columnMap() {
+    return {
+      _id: 'id',
+      productId: 'product_id',
+      sourceLocation: 'source_location_id',
+      destinationLocation: 'destination_location_id',
+      scheduledDate: 'scheduled_date',
+      responsible: 'responsible_id',
+      createdAt: 'created_at',
+    };
+  }
+
+  static get relationMap() {
+    return {
+      productId: { model: require('./Product') },
+      sourceLocation: { model: require('./Location') },
+      destinationLocation: { model: require('./Location') },
+      responsible: { model: require('./User') },
+    };
+  }
+}
+
+module.exports = StockMove;

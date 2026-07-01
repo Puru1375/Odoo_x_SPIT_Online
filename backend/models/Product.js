@@ -1,13 +1,26 @@
-const mongoose = require('mongoose');
+const { BaseModel } = require('./baseModel');
 
-const productSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  sku: { type: String, required: true, unique: true },
-  category: { type: String, default: 'Uncategorized' },
-  uom: { type: String, default: 'Units' }, // Unit of Measure (e.g., kg, pcs, m)
-  costPrice: { type: Number, default: 0 },
-  totalStock: { type: Number, default: 0 },
-  lowStockThreshold: { type: Number, default: 10 } // Reordering Rule
-});
+class Product extends BaseModel {
+  static get tableName() {
+    return 'products';
+  }
 
-module.exports = mongoose.model('Product', productSchema);
+  static get fieldTransforms() {
+    return {
+      costPrice: Number,
+      totalStock: Number,
+      lowStockThreshold: Number,
+    };
+  }
+
+  static get columnMap() {
+    return {
+      _id: 'id',
+      costPrice: 'cost_price',
+      totalStock: 'total_stock',
+      lowStockThreshold: 'low_stock_threshold',
+    };
+  }
+}
+
+module.exports = Product;
