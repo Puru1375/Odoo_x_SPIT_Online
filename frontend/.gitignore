@@ -68,3 +68,7 @@ terraform.tfstate.backup
 # Temporary
 tmp/
 .cache/
+
+.
+
+

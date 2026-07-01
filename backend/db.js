@@ -5,7 +5,7 @@ const hasConnectionString = Boolean(process.env.DATABASE_URL);
 const pool = hasConnectionString
   ? new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: process.env.PGSSLMODE === 'require' ? { rejectUnauthorized: false } : undefined,
+      ssl: { rejectUnauthorized: false } ,
       connectionTimeoutMillis: 5000,
       idleTimeoutMillis: 10000,
       allowExitOnIdle: true,
