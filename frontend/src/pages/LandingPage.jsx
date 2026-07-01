@@ -156,7 +156,7 @@ const LandingPage = () => {
             Get Started Now
           </Link>
           <p className="mt-8 text-gray-500 text-sm">
-            © {new Date().getFullYear()} StockMaster. Built for Hackathon.
+            © {new Date().getFullYear()} StockMaster. Built Odoo X SPIT Hackathon.
           </p>
         </div>
       </footer>
