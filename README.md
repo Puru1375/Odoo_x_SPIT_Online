@@ -1,263 +1,150 @@
 ﻿# StockMaster - Inventory Management System
-A comprehensive modular inventory management system with OTP-based authentication, designed for inventory managers and warehouse staff.
 
----
+StockMaster is a modular inventory management platform for warehouse teams, inventory managers, and operators who need to track products, stock movements, and warehouse activity in one place. It supports secure authentication, product management, inventory tracking, and dashboard reporting for day-to-day operations.
 
-- **Reviewer:** [Aman Patel(ampa)](https://github.com/ampa-odoo)
+## Project Overview
 
-### Team Members
-- **Leader:** [Purvanshu Machhi](https://github.com/Puru1375)
-- **Member:** [Tejas Panchal](https://github.com/Tejas-Panchal)
-- **Member:** [Dhyeya Dawawala](https://github.com/Dhyeya-Dawawala)
-- **Member:** [Dev Jagtap](https://github.com/jagtapdev55-afk)
+StockMaster helps teams manage stock across vendors, warehouses, customers, and production areas. The application includes OTP-based authentication, role-aware access, operational workflows for receipts and deliveries, and a real-time dashboard for visibility into stock levels and pending operations.
 
----
+Main features include:
+- User authentication with OTP verification and JWT sessions
+- Product management with CRUD operations
+- Inventory tracking across multiple locations
+- Warehouse workflows for receipts, deliveries, transfers, and adjustments
+- KPI dashboard for operational insight
+- User profile management
 
-## Features
+## Architecture Diagram
 
-- 🔐 **Secure OTP Authentication** - Two-factor authentication via email
-- 📊 **Real-time Dashboard** - Track KPIs, stock levels, and operations
-- 📦 **Product Management** - Full CRUD operations for inventory items
-- 🚛 **Operations Module**
-  - Receipts (Stock In from vendors)
-  - Deliveries (Stock Out to customers)
-  - Internal Transfers (Move between warehouses)
-  - Inventory Adjustments (Stock corrections)
-- 🔍 **Dynamic Filtering** - Filter by status, search by reference/product
-- 🏢 **Multi-Warehouse Support** - Track stock across multiple locations
-- 👤 **User Profiles** - Manage user details and settings
+```text
+Users │ Route53 │ CloudFront │ AWS WAF │ ALB │ ECS Fargate │ PostgreSQL + Redis + S3
+```
 
 ## Tech Stack
 
-### Backend
+- React
+- Vite
+- Express
+- PostgreSQL
+- Docker
+- AWS ECS
+- RDS
+- CloudFront
+- GitHub Actions
+- Redis
 
-- Node.js + Express.js
-- MongoDB + Mongoose
-- JWT Authentication
-- Nodemailer (Email OTP)
-- bcryptjs (Password hashing)
+## Features
 
-### Frontend
+- User authentication
+- Product management
+- Inventory tracking
+- Warehouse management
+- Dashboard
+- JWT authentication
+- OTP-based registration and login flow
+- Request logging, rate limiting, compression, and security headers
 
-- React 18
-- React Router v6
-- Axios
-- Tailwind CSS
-- React Icons
+## Folder Structure
 
-## Prerequisites
-
-- Node.js (v16 or higher)
-- MongoDB (local or Atlas)
-- Gmail account (for OTP emails)
+```text
+stockmaster/
+├── backend/
+│   ├── routes/
+│   ├── models/
+│   ├── middleware/
+│   ├── logger.js
+│   ├── index.js
+│   └── seed.js
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── App.jsx
+│   │   └── api.js
+│   └── vite.config.js
+└── README.md
+```
 
 ## Installation
 
-### Backend Setup
-
 ```bash
-cd backend
+git clone <repository-url>
+cd odooxspit_online
 npm install
-```
-
-Create `.env` file in backend directory:
-
-```env
-MONGO_URI=mongodb://localhost:27017/stockmaster
-PORT=5000
-JWT_SECRET=your-secret-key-here
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-gmail-app-password
-```
-
-**Important:** For Gmail, use an [App Password](https://support.google.com/accounts/answer/185833) instead of your regular password.
-
-Run database seeding (optional):
-
-```bash
-node index.js
-```
-
-Start backend server:
-
-```bash
 npm run dev
 ```
 
-### Frontend Setup
+Use `npm install` inside `backend/` and `frontend/` if you prefer installing dependencies per app.
+
+## Environment Variables
+
+Create `backend/.env` and define the required variables without committing the file to source control:
+
+- `PORT`
+- `NODE_ENV`
+- `LOG_LEVEL`
+- `JWT_SECRET`
+- `EMAIL_USER`
+- `EMAIL_PASS`
+- `DATABASE_URL`
+- `PGHOST`
+- `PGPORT`
+- `PGUSER`
+- `PGPASSWORD`
+- `PGDATABASE`
+- `PGSSLMODE`
+- `ALLOWED_ORIGINS`
+- `RATE_LIMIT_WINDOW_MS`
+- `RATE_LIMIT_MAX`
+- `AUTH_RATE_LIMIT_WINDOW_MS`
+- `AUTH_RATE_LIMIT_MAX`
+- `COMPRESSION_LEVEL`
+- `JSON_LIMIT`
+- `REDIS_URL`
+
+## Docker
+
+The backend is container-friendly and can be started with Docker Compose when the service definitions are present:
 
 ```bash
-cd frontend
-npm install
+docker compose up
 ```
 
-Start frontend development server:
+This is useful for local development and for matching production-style runtime behavior.
 
-```bash
-npm run dev
-```
+## AWS Deployment
 
-The application will be available at `http://localhost:5173`
-
-## Usage
-
-### Authentication Flow
-
-1. **Register** - Navigate to `/signup` and create an account
-2. **Login** - Enter email and password
-3. **OTP Verification** - Check your email (or backend console) for the 6-digit OTP
-4. **Dashboard** - After successful OTP verification, access the dashboard
-
-> **Development Tip:** OTP is logged to the backend console for easy testing
-
-### Main Features
-
-#### Products
-
-- Create, view, edit, and delete products
-- Track SKU, name, category, and total stock
-
-#### Operations
-
-**Receipts (Stock In)**
-
-- Create receipt orders from vendors
-- Validate to increase stock levels
-- Filter by status (Draft/Done) and search
-
-**Deliveries (Stock Out)**
-
-- Create delivery orders to customers
-- Validate to decrease stock levels
-- Filter and search functionality
-
-**Internal Transfers**
-
-- Move stock between warehouses/locations
-- Track source and destination
-
-**Inventory Adjustments**
-
-- Correct stock discrepancies
-- Support positive (gain) and negative (loss) adjustments
-
-## API Endpoints
-
-### Authentication
-
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login and send OTP
-- `POST /api/auth/verify-otp` - Verify OTP and get JWT token
-
-### Products
-
-- `GET /api/products` - List all products
-- `POST /api/products` - Create product
-- `PUT /api/products/:id` - Update product
-- `DELETE /api/products/:id` - Delete product
-
-### Stock Moves
-
-- `GET /api/moves?type=receipt` - Get receipts
-- `GET /api/moves?type=delivery` - Get deliveries
-- `GET /api/moves?type=internal` - Get internal transfers
-- `GET /api/moves?type=adjustment` - Get adjustments
-- `POST /api/moves` - Create stock move
-- `PUT /api/moves/:id/validate` - Validate move (update stock)
-
-### Locations
-
-- `GET /api/locations` - List all warehouses/locations
-
-### Dashboard
-
-- `GET /api/dashboard` - Get dashboard KPIs
-
-### User Profile
-
-- `GET /api/user/profile` - Get user details
-- `PUT /api/user/profile` - Update user profile
-
-## Project Structure
-
-```
-stockmaster/
-├── backend/
-│   ├── models/
-│   │   ├── User.js
-│   │   ├── Product.js
-│   │   ├── Location.js
-│   │   └── StockMove.js
-│   ├── routes/
-│   │   ├── authRoutes.js
-│   │   ├── productRoutes.js
-│   │   ├── locationRoutes.js
-│   │   ├── moveRoutes.js
-│   │   ├── dashboardRoutes.js
-│   │   └── userRoutes.js
-│   ├── index.js
-│   └── seed.js
-│
-└── frontend/
-    ├── src/
-    │   ├── components/
-    │   │   ├── Layout.jsx
-    │   │   └── ProtectedRoute.jsx
-    │   ├── pages/
-    │   │   ├── Login.jsx
-    │   │   ├── Signup.jsx
-    │   │   ├── Dashboard.jsx
-    │   │   ├── Products.jsx
-    │   │   ├── Receipts.jsx
-    │   │   ├── Deliveries.jsx
-    │   │   ├── InternalTransfers.jsx
-    │   │   ├── InventoryAdjustments.jsx
-    │   │   ├── Profile.jsx
-    │   │   └── Settings.jsx
-    │   ├── App.jsx
-    │   └── api.js
-    └── package.json
-```
+The target deployment flow is designed for AWS:
+- Users access the app through Route53 and CloudFront
+- AWS WAF protects the edge layer
+- The frontend and API can be served behind an ALB
+- Backend containers run on ECS Fargate
+- PostgreSQL runs on RDS
+- Redis is used for caching and health/status checks
+- S3 can store static assets or uploads
+- GitHub Actions can automate build and deployment
 
 ## Security Features
 
-- ✅ Password hashing with bcryptjs
-- ✅ JWT token-based authentication
-- ✅ OTP verification (10-minute expiry)
-- ✅ Protected routes (frontend & backend)
-- ✅ Secure logout with state cleanup
+- Password hashing with bcryptjs
+- JWT token-based authentication
+- OTP verification with expiry
+- Explicit CORS origins
+- Rate limiting for general and authentication endpoints
+- Security headers via Helmet
+- Request compression
+- Structured logging with redaction for secrets
 
-## Development
+## Future Improvements
 
-### Backend Development
-
-```bash
-cd backend
-npm run dev  # Uses nodemon for auto-reload
-```
-
-### Frontend Development
-
-```bash
-cd frontend
-npm run dev  # Vite dev server with HMR
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+- Notifications
+- Analytics
+- Multi-tenancy
+- Kubernetes deployment
 
 ## Support
 
-For issues or questions, please open an issue on GitHub.
-
----
-
-**Built for hackathons and production use** 🚀
+For questions or issues, open a GitHub issue or contact the team members listed above.
 
 
 

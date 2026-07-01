@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const StockMove = require('../models/StockMove');
 const Product = require('../models/Product');
-const { protect, authorize } = require('../middleware/authMiddleware');
+const { protect, authorize, rateLimit } = require('../middleware/authMiddleware');
 
 // GET all moves (Filter by type via query param ?type=receipt)
-router.get('/', protect, async (req, res) => {
+router.get('/', protect, rateLimit, async (req, res) => {
   try {
     const filter = {};
     if (req.query.type) filter.type = req.query.type;
@@ -24,7 +24,7 @@ router.get('/', protect, async (req, res) => {
 });
 
 // POST Create a NEW Move (Status: Draft)
-router.post('/', protect, async (req, res) => {
+router.post('/', protect, rateLimit, async (req, res) => {
   // Generate a simple reference ID (e.g., WH/IN/timestamp)
   const reference = `WH/${req.body.type.toUpperCase()}/${Date.now().toString().slice(-4)}`;
 

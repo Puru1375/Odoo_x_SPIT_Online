@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { rateLimit } = require('../middleware/authMiddleware');
 
 // Middleware to verify token (Basic implementation)
 const auth = (req, res, next) => {
@@ -12,7 +13,7 @@ const auth = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecretkey');
     req.user = decoded;
     next();
-  } catch (e) {
+  } catch (_e) {
     res.status(400).json({ message: 'Token is not valid' });
   }
 };
@@ -20,11 +21,11 @@ const auth = (req, res, next) => {
 // @route   GET /api/user/profile
 // @desc    Get current user profile
 // @access  Private
-router.get('/profile', auth, async (req, res) => {
+router.get('/profile', auth, rateLimit, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
     res.json(user);
-  } catch (err) {
+  } catch (_err) {
     res.status(500).json({ message: 'Server Error' });
   }
 });
@@ -32,7 +33,7 @@ router.get('/profile', auth, async (req, res) => {
 // @route   PUT /api/user/profile
 // @desc    Update user profile
 // @access  Private
-router.put('/profile', auth, async (req, res) => {
+router.put('/profile', auth, rateLimit, async (req, res) => {
   try {
     const { name, email } = req.body;
     const user = await User.findById(req.user.id);
@@ -52,7 +53,7 @@ router.put('/profile', auth, async (req, res) => {
     } else {
       res.status(404).json({ message: 'User not found' });
     }
-  } catch (err) {
+  } catch (_err) {
     res.status(500).json({ message: 'Server Error' });
   }
 });

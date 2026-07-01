@@ -96,7 +96,7 @@ const ReceiptForm = () => {
         <div className="flex border rounded-r overflow-hidden">
             {steps.map((step) => (
                 <div key={step} 
-                     className={`px-4 py-2 text-sm font-bold uppercase border-l 
+                     className={`px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm font-bold uppercase border-l 
                      ${formData.status === step ? 'bg-blue-600 text-white' : 'bg-white text-gray-500'}`}>
                     {step}
                 </div>
@@ -106,51 +106,51 @@ const ReceiptForm = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-3 sm:p-6">
       {/* Top Nav */}
-      <div className="flex justify-between items-center mb-4 no-print">
-        <button onClick={() => navigate('/receipts')} className="text-gray-500 flex items-center hover:text-gray-800">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 no-print">
+        <button onClick={() => navigate('/receipts')} className="text-gray-500 flex items-center hover:text-gray-800 text-sm sm:text-base">
             <FaArrowLeft className="mr-2"/> Back to Receipts
         </button>
-        <div className="text-gray-400 text-sm">StockMaster / Receipts / {formData.reference}</div>
+        <div className="text-gray-400 text-xs sm:text-sm">StockMaster / Receipts / {formData.reference}</div>
       </div>
 
       {/* --- CONTROL PANEL (Action Bar) --- */}
-      <div className="bg-white border rounded-t-lg p-3 flex justify-between items-center shadow-sm">
+      <div className="bg-white border rounded-t-lg p-3 flex flex-col sm:flex-row justify-between items-stretch sm:items-center shadow-sm gap-3">
         
         {/* LEFT: Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
             {/* 1. EDIT MODE (New) */}
             {isNew && (
-                <button onClick={handleSave} className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">
+                <button onClick={handleSave} className="bg-blue-600 text-white px-3 sm:px-4 py-1 rounded hover:bg-blue-700 text-sm sm:text-base">
                     Save
                 </button>
             )}
 
             {/* 2. DRAFT -> READY (Mark as Todo) */}
             {!isNew && formData.status === 'draft' && (
-                <button onClick={() => updateStatus('ready')} className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">
+                <button onClick={() => updateStatus('ready')} className="bg-blue-600 text-white px-3 sm:px-4 py-1 rounded hover:bg-blue-700 text-sm sm:text-base">
                     Mark as Todo
                 </button>
             )}
 
             {/* 3. READY -> DONE (Validate) */}
             {!isNew && formData.status === 'ready' && (
-                <button onClick={() => updateStatus('done')} className="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700">
+                <button onClick={() => updateStatus('done')} className="bg-green-600 text-white px-3 sm:px-4 py-1 rounded hover:bg-green-700 text-sm sm:text-base">
                     Validate
                 </button>
             )}
 
             {/* 4. PRINT (Only when Done) */}
             {!isNew && formData.status === 'done' && (
-                <button onClick={handlePrint} className="border border-gray-300 text-gray-700 px-4 py-1 rounded hover:bg-gray-50 flex items-center">
+                <button onClick={handlePrint} className="border border-gray-300 text-gray-700 px-3 sm:px-4 py-1 rounded hover:bg-gray-50 flex items-center text-sm sm:text-base">
                     <FaPrint className="mr-2"/> Print
                 </button>
             )}
 
             {/* CANCEL */}
             {!isNew && formData.status !== 'done' && (
-                 <button onClick={() => updateStatus('cancelled')} className="text-red-500 px-4 py-1 rounded hover:bg-red-50">
+                 <button onClick={() => updateStatus('cancelled')} className="text-red-500 px-3 sm:px-4 py-1 rounded hover:bg-red-50 text-sm sm:text-base">
                     Cancel
                 </button>
             )}
@@ -161,20 +161,20 @@ const ReceiptForm = () => {
       </div>
 
       {/* --- DOCUMENT BODY --- */}
-      <div className="bg-white border-x border-b rounded-b-lg p-8 shadow-sm printable-area">
+      <div className="bg-white border-x border-b rounded-b-lg p-4 sm:p-8 shadow-sm printable-area">
         
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">{formData.reference}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 sm:mb-8">{formData.reference}</h1>
 
         {/* Form Fields Grid */}
-        <div className="grid grid-cols-2 gap-x-12 gap-y-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 sm:gap-x-12 gap-y-4 sm:gap-y-6 mb-6 sm:mb-8">
             
             {/* Left Column */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
                 <div>
-                    <label className="block text-sm font-bold text-gray-700">Receive From</label>
+                    <label className="block text-xs sm:text-sm font-bold text-gray-700">Receive From</label>
                     <select 
                         disabled={!isNew}
-                        className="w-full border-b-2 border-gray-200 py-2 focus:outline-none focus:border-blue-500 bg-transparent"
+                        className="w-full border-b-2 border-gray-200 py-2 focus:outline-none focus:border-blue-500 bg-transparent text-sm sm:text-base"
                         value={formData.sourceLocation}
                         onChange={e => setFormData({...formData, sourceLocation: e.target.value})}
                     >
@@ -186,10 +186,10 @@ const ReceiptForm = () => {
                 </div>
 
                 <div>
-                     <label className="block text-sm font-bold text-gray-700">Responsible</label>
+                     <label className="block text-xs sm:text-sm font-bold text-gray-700">Responsible</label>
                      <input 
                         disabled
-                        className="w-full border-b-2 border-gray-200 py-2 bg-transparent text-gray-600"
+                        className="w-full border-b-2 border-gray-200 py-2 bg-transparent text-gray-600 text-sm sm:text-base"
                         value={formData.responsibleName}
                      />
                      <span className="text-xs text-gray-400">Auto-filled with current user</span>
@@ -197,13 +197,13 @@ const ReceiptForm = () => {
             </div>
 
             {/* Right Column */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
                 <div>
-                    <label className="block text-sm font-bold text-gray-700">Scheduled Date</label>
+                    <label className="block text-xs sm:text-sm font-bold text-gray-700">Scheduled Date</label>
                     <input 
                         type="date"
                         disabled={!isNew}
-                        className="w-full border-b-2 border-gray-200 py-2 focus:outline-none focus:border-blue-500 bg-transparent"
+                        className="w-full border-b-2 border-gray-200 py-2 focus:outline-none focus:border-blue-500 bg-transparent text-sm sm:text-base"
                         value={formData.scheduledDate}
                         onChange={e => setFormData({...formData, scheduledDate: e.target.value})}
                     />
@@ -211,21 +211,22 @@ const ReceiptForm = () => {
                 
                 {/* Destination (Hidden mostly, but good for reference) */}
                 <div>
-                    <label className="block text-sm font-bold text-gray-700">Destination</label>
-                    <div className="py-2 text-gray-600">Main Warehouse</div>
+                    <label className="block text-xs sm:text-sm font-bold text-gray-700">Destination</label>
+                    <div className="py-2 text-gray-600 text-sm sm:text-base">Main Warehouse</div>
                 </div>
             </div>
         </div>
 
         {/* Products Tabs/Lines */}
-        <div className="mt-8">
+        <div className="mt-6 sm:mt-8">
             <div className="border-b border-gray-300 mb-4">
-                <span className="inline-block border-b-2 border-blue-600 pb-2 text-blue-600 font-bold">Operations</span>
+                <span className="inline-block border-b-2 border-blue-600 pb-2 text-blue-600 font-bold text-sm sm:text-base">Operations</span>
             </div>
 
-            <table className="min-w-full text-left">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
                 <thead>
-                    <tr className="text-gray-500 text-sm border-b">
+                    <tr className="text-gray-500 text-xs sm:text-sm border-b">
                         <th className="pb-3">Product</th>
                         <th className="pb-3">Quantity</th>
                     </tr>
@@ -235,7 +236,7 @@ const ReceiptForm = () => {
                         <td className="py-4">
                              <select 
                                 disabled={!isNew}
-                                className="w-full p-2 border rounded bg-gray-50"
+                                className="w-full p-2 border rounded bg-gray-50 text-xs sm:text-sm"
                                 value={formData.productId}
                                 onChange={e => setFormData({...formData, productId: e.target.value})}
                             >
@@ -247,14 +248,15 @@ const ReceiptForm = () => {
                             <input 
                                 type="number"
                                 disabled={!isNew}
-                                className="w-24 p-2 border rounded bg-gray-50 text-right"
+                                className="w-20 sm:w-24 p-2 border rounded bg-gray-50 text-right text-xs sm:text-sm"
                                 value={formData.quantity}
                                 onChange={e => setFormData({...formData, quantity: e.target.value})}
                             />
                         </td>
                     </tr>
                 </tbody>
-            </table>
+              </table>
+            </div>
         </div>
 
       </div>

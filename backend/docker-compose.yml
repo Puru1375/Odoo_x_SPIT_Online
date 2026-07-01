@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+
+  backend:
+
+    build:
+      context: .
+
+    container_name: odoospit-backend
+
+    restart: unless-stopped
+
+    ports:
+      - "5000:5000"
+
+    env_file:
+      - .env
+
+    networks:
+      - odoospit
+
+networks:
+
+  odoospit:

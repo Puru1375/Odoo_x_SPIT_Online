@@ -1,13 +1,17 @@
-const mongoose = require('mongoose');
+const { BaseModel } = require('./baseModel');
 
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ['Manager', 'Staff'], default: 'Staff' },
-  isVerified: { type: Boolean, default: false },
-  otp: String,
-  otpExpires: Date
-});
+class User extends BaseModel {
+  static get tableName() {
+    return 'users';
+  }
 
-module.exports = mongoose.model('User', userSchema);
+  static get columnMap() {
+    return {
+      _id: 'id',
+      isVerified: 'is_verified',
+      otpExpires: 'otp_expires',
+    };
+  }
+}
+
+module.exports = User;
