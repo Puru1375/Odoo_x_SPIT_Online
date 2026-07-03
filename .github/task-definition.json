@@ -1,0 +1,170 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:ap-south-1:984285320293:task-definition/odoospit-backend:8",
+    "containerDefinitions": [
+        {
+            "name": "odoospit-backend",
+            "image": "984285320293.dkr.ecr.ap-south-1.amazonaws.com/odoospit-backend:v1.0.2",
+            "cpu": 1024,
+            "portMappings": [
+                {
+                    "containerPort": 5000,
+                    "hostPort": 5000,
+                    "protocol": "tcp",
+                    "name": "odoospit-backend-5000-tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "EMAIL_PASS",
+                    "value": "uari dtat vvel igou"
+                },
+                {
+                    "name": "ALLOWED_ORIGINS",
+                    "value": "https://devplatform.click,https://www.devplatform.click"
+                },
+                {
+                    "name": "RATE_LIMIT_MAX",
+                    "value": "100"
+                },
+                {
+                    "name": "COMPRESSION_LEVEL",
+                    "value": "6"
+                },
+                {
+                    "name": "PGSSLMODE",
+                    "value": "require"
+                },
+                {
+                    "name": "EMAIL_USER",
+                    "value": "purvanshu1375@gmail.com"
+                },
+                {
+                    "name": "NODE_ENV",
+                    "value": "production"
+                },
+                {
+                    "name": "RATE_LIMIT_WINDOW_MS",
+                    "value": "900000"
+                },
+                {
+                    "name": "AUTH_RATE_LIMIT_MAX",
+                    "value": "5"
+                },
+                {
+                    "name": "LOG_LEVEL",
+                    "value": "debug"
+                },
+                {
+                    "name": "AUTH_RATE_LIMIT_WINDOW_MS",
+                    "value": "600000"
+                },
+                {
+                    "name": "JSON_LIMIT",
+                    "value": "10mb"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "DATABASE_URL",
+                    "valueFrom": "arn:aws:secretsmanager:ap-south-1:984285320293:secret:/odoospit/prod/database-YyBpeZ:DATABASE_URL::"
+                },
+                {
+                    "name": "JWT_SECRET",
+                    "valueFrom": "arn:aws:secretsmanager:ap-south-1:984285320293:secret:/odoospit/prod/jwt-V2lx3N:JWT_SECRET::"
+                }
+            ],
+            "ulimits": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/odoospit-backend",
+                    "awslogs-create-group": "true",
+                    "awslogs-region": "ap-south-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:5000/health || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 30
+            },
+            "systemControls": []
+        }
+    ],
+    "family": "odoospit-backend",
+    "taskRoleArn": "arn:aws:iam::984285320293:role/odoospit-ecs-task-role",
+    "executionRoleArn": "arn:aws:iam::984285320293:role/odoospit-ecs-execution-role",
+    "networkMode": "awsvpc",
+    "revision": 8,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.container-health-check"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "ecs.capability.secrets.asm.environment-variables"
+        },
+        {
+            "name": "ecs.capability.extensible-ephemeral-storage"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "2048",
+    "registeredAt": "2026-06-29T13:05:54.746Z",
+    "registeredBy": "arn:aws:iam::984285320293:user/admin_puru",
+    "ephemeralStorage": {
+        "sizeInGiB": 21
+    },
+    "enableFaultInjection": false,
+    "tags": []
+}

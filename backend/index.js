@@ -98,7 +98,7 @@ initDatabase()
   .then(() => {
     logger.info('✅ Postgres database connected successfully');
     app.listen(PORT, () => {
-      logger.info(`🚀 Server running on port ${PORT}`);
+      logger.info(`🚀 Deployed Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
