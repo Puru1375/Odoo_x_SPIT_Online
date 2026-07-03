@@ -36,7 +36,7 @@ jobs:
 
       - name: Create Production Environment File
         run: |
-          echo "VITE_API_URL=https://api.devplatform.click" > .env.production
+          echo "VITE_API_URL=https://api.devplatform.click/api" > .env.production
 
       - name: Build Frontend
         run: npm run build
