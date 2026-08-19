@@ -53,7 +53,7 @@ RUN mkdir -p logs/error logs/combined logs/http && \
 
 USER nodeuser
 
-EXPOSE 5000
+EXPOSE 3000
 
 LABEL maintainer="Purvanshu"
 
@@ -65,6 +65,6 @@ HEALTHCHECK --interval=30s \
             --timeout=10s \
             --start-period=20s \
             --retries=3 \
-            CMD wget --spider http://localhost:5000/health || exit 1
+            CMD wget --spider http://localhost:3000/health || exit 1
 
 CMD ["node","index.js"]
