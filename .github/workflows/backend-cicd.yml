@@ -12,27 +12,50 @@ permissions:
 env:
   AWS_REGION: ap-south-1
   ECR_REPOSITORY: enterprise-dev-backend
+  ECS_CLUSTER: enterprise-dev-cluster
+  ECS_SERVICE: enterprise-dev-service
+  ECS_TASK_DEFINITION: enterprise-dev-task
+  CONTAINER_NAME: backend
 
 jobs:
 
-  build-and-push:
-    name: Build and Push Backend
+  build-and-deploy:
+    name: Build and Deploy Backend
     runs-on: ubuntu-latest
 
     steps:
 
+      # ------------------------------------------
+      # CHECKOUT
+      # ------------------------------------------
+
       - name: Checkout repository
         uses: actions/checkout@v4
+
+
+      # ------------------------------------------
+      # AWS OIDC
+      # ------------------------------------------
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::984285320293:role/enterprise-dev-app-github-actions-role
-          aws-region: ap-south-1
+          aws-region: ${{ env.AWS_REGION }}
+
+
+      # ------------------------------------------
+      # ECR LOGIN
+      # ------------------------------------------
 
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+
+
+      # ------------------------------------------
+      # BUILD DOCKER IMAGE
+      # ------------------------------------------
 
       - name: Build Docker image
         working-directory: backend
@@ -44,6 +67,11 @@ jobs:
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
             .
 
+
+      # ------------------------------------------
+      # PUSH TO ECR
+      # ------------------------------------------
+
       - name: Push Docker image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -51,3 +79,48 @@ jobs:
         run: |
           docker push \
             $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+
+      # ------------------------------------------
+      # DOWNLOAD CURRENT TASK DEFINITION
+      # ------------------------------------------
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition $ECS_TASK_DEFINITION \
+            --query taskDefinition \
+            > task-definition.json
+
+
+      # ------------------------------------------
+      # RENDER NEW TASK DEFINITION
+      # ------------------------------------------
+
+      - name: Render ECS task definition
+        id: render-task
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+
+      - name: Start ECS service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 1
+
+      # ------------------------------------------
+      # DEPLOY ECS
+      # ------------------------------------------
+
+      - name: Deploy ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render-task.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
