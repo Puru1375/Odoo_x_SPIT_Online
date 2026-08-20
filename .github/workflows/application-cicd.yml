@@ -18,6 +18,7 @@ env:
   ECS_SERVICE: enterprise-dev-service
   ECS_TASK_DEFINITION: enterprise-dev-task
   CONTAINER_NAME: backend
+  ALB_DNS_NAME: enterprise-dev-alb-411674330.ap-south-1.elb.amazonaws.com
 
   # Frontend
   S3_BUCKET: enterprise-dev-frontend
@@ -96,6 +97,27 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
+
+
+      - name: Backend application health check
+        run: |
+          echo "Waiting for backend health..."
+
+          for i in {1..20}; do
+            if curl --fail --silent \
+              "http://${ALB_DNS_NAME}/health"; then
+
+              echo ""
+              echo "Backend health check passed."
+              exit 0
+            fi
+
+            echo "Backend not ready yet. Attempt $i/20..."
+            sleep 15
+          done
+
+          echo "Backend health check failed."
+          exit 1
 
 
   # ============================================================
