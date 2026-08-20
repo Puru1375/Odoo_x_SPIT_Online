@@ -1,0 +1,153 @@
+name: Application CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ap-south-1
+
+  # Backend
+  ECR_REPOSITORY: enterprise-dev-backend
+  ECS_CLUSTER: enterprise-dev-cluster
+  ECS_SERVICE: enterprise-dev-service
+  ECS_TASK_DEFINITION: enterprise-dev-task
+  CONTAINER_NAME: backend
+
+  # Frontend
+  S3_BUCKET: enterprise-dev-frontend
+  CLOUDFRONT_DISTRIBUTION_ID: E2EGVMU23APOZ7
+  VITE_API_URL: /api
+
+jobs:
+
+  # ============================================================
+  # BACKEND
+  # ============================================================
+
+  backend:
+    name: Backend - Docker → ECR → ECS
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::984285320293:role/enterprise-dev-app-github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Docker image
+        working-directory: backend
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            .
+
+      - name: Push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker push \
+            $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Download current ECS task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition $ECS_TASK_DEFINITION \
+            --query taskDefinition \
+            > task-definition.json
+
+      - name: Render new ECS task definition
+        id: render-task
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Start ECS service
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 1
+
+      - name: Deploy ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render-task.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+
+  # ============================================================
+  # FRONTEND
+  # ============================================================
+
+  frontend:
+    name: Frontend - Build → S3 → CloudFront
+
+    needs:
+      - backend
+      
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::984285320293:role/enterprise-dev-app-github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configure frontend environment
+        working-directory: frontend
+        run: |
+          echo "VITE_API_URL=${VITE_API_URL}" > .env
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Deploy frontend to S3
+        run: |
+          aws s3 sync frontend/dist/ s3://${S3_BUCKET}/ \
+            --delete
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} \
+            --paths "/*"
