@@ -21,7 +21,7 @@ env:
 
   # Frontend
   S3_BUCKET: enterprise-dev-frontend
-  CLOUDFRONT_DISTRIBUTION_ID: E2EGVMU23APOZ7
+  CLOUDFRONT_DISTRIBUTION_ID: E1P1J4U0L0P2P2
   VITE_API_URL: /api
 
 jobs:
@@ -107,7 +107,7 @@ jobs:
 
     needs:
       - backend
-      
+
     runs-on: ubuntu-latest
 
     steps:
