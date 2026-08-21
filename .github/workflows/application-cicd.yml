@@ -18,8 +18,8 @@ env:
   ECS_SERVICE: enterprise-dev-service
   ECS_TASK_DEFINITION: enterprise-dev-task
   CONTAINER_NAME: backend
-  ALB_DNS_NAME: enterprise-dev-alb-411674330.ap-south-1.elb.amazonaws.com
-
+  ALB_DNS_NAME: enterprise-dev-alb-1529963630.ap-south-1.elb.amazonaws.com
+  
   # Frontend
   S3_BUCKET: enterprise-dev-frontend
   CLOUDFRONT_DISTRIBUTION_ID: E10DZIY8HR1OV7
